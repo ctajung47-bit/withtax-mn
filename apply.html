@@ -580,6 +580,17 @@ label.file .t.inline .mn::before,label.file .t.inline .ko::before{content:""}
   const arc=document.getElementById('arc');arc.addEventListener('input',()=>{const v=arc.value.replace(/\D/g,'').slice(0,13);arc.value=v.length>6?v.slice(0,6)+'-'+v.slice(6):v;});
   const pw=document.getElementById('htPw'),eye=document.getElementById('pwEye');eye.onclick=()=>{const s=pw.type==='password';pw.type=s?'text':'password';eye.textContent=s?'숨김':'보기';};
   const toB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f);});
+  // 사진 축소: 긴 변 2000px, JPEG 0.85 → 보통 300~800KB (문자 판독에 충분)
+  async function shrink(f){
+    if(!f.type.startsWith('image/')||f.size<700*1024)return f;
+    try{const bmp=await createImageBitmap(f);const L=2000,s=Math.min(1,L/Math.max(bmp.width,bmp.height));
+      const c=document.createElement('canvas');c.width=Math.round(bmp.width*s);c.height=Math.round(bmp.height*s);
+      c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+      const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',0.85));
+      if(!blob||blob.size>=f.size)return f;
+      return new File([blob],f.name.replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg'});}catch(e){return f;}
+  }
+  async function post(obj){const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(obj)});return r.json();}
 
   document.getElementById('apply').addEventListener('submit',async e=>{
     e.preventDefault();
@@ -591,26 +602,38 @@ label.file .t.inline .mn::before,label.file .t.inline .ko::before{content:""}
     if(!document.querySelector('input[name=prev]:checked')){err.textContent=ko?'이전 환급 여부를 선택하세요.':'Өмнө буцаалт авсан эсэхээ сонгоно уу.';return;}
     for(const slot of document.querySelectorAll('.slot[data-req]')){ if(!store[slot.dataset.role].length){err.textContent=(ko?'필수 자료 누락: ':'Шаардлагатай баримт дутуу: ')+slot.querySelector('.slot-h .'+(ko?'ko':'mn')).textContent;slot.scrollIntoView({behavior:'smooth',block:'center'});return;} }
     const all=Object.entries(store).flatMap(([role,l])=>l.map(f=>({role,f})));
-    const total=all.reduce((a,x)=>a+x.f.size,0); if(total>MAX_TOTAL){err.textContent=ko?'전체 용량이 40MB를 넘습니다.':'Нийт хэмжээ 40MB-аас их байна.';return;}
     if(!document.getElementById('agree').checked){err.textContent=ko?'동의에 체크해 주세요.':'Зөвшөөрлийг чагтална уу.';return;}
     err.textContent='';
-    const payload={lang:ko?'ko':'mn',name:g('name').toUpperCase(),arc:g('arc'),arcOld:g('arcOld'),phone:g('phone'),visa:g('visa'),addr:g('addr'),hireDate:g('hireDate'),companies:g('companies'),
+    const base={lang:ko?'ko':'mn',name:g('name').toUpperCase(),arc:g('arc'),arcOld:g('arcOld'),phone:g('phone'),visa:g('visa'),addr:g('addr'),hireDate:g('hireDate'),companies:g('companies'),
       prev:document.querySelector('input[name=prev]:checked').value,prevYears:g('prevYears'),bank:g('bank'),acct:g('acct'),htId:g('htId'),htPw:g('htPw'),memo:g('memo'),
-      proxy:proxy.checked?(g('pxName')+' '+g('pxTel')).trim():'',files:[]};
+      proxy:proxy.checked?(g('pxName')+' '+g('pxTel')).trim():''};
     const btn=document.getElementById('submitBtn'),prog=document.getElementById('prog'),bar=document.getElementById('bar'),progT=document.getElementById('progT');
     btn.disabled=true;prog.hidden=false;
-    for(let i=0;i<all.length;i++){progT.textContent=(ko?'파일 준비 중 ':'Файл бэлтгэж байна ')+(i+1)+'/'+all.length;bar.style.width=Math.round(40*(i+1)/all.length)+'%';
-      payload.files.push({role:all[i].role,name:all[i].f.name,type:all[i].f.type||'application/octet-stream',data:await toB64(all[i].f)});}
-    progT.textContent=ko?'전송 중…':'Илгээж байна…';bar.style.width='60%';
-    let res=null;
-    if(ENDPOINT){
-      try{const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(payload)});res=await r.json();}
-      catch(ex){res={ok:false,error:String(ex)};}
-      if(!res.ok){btn.disabled=false;prog.hidden=true;err.textContent=(ko?'전송 실패. 다시 시도하거나 담당자에게 연락하세요. ':'Илгээж чадсангүй. Дахин оролдоно уу. ')+(res.error||'');return;}
-    } else { res={ok:true,no:'TEST-'+Date.now().toString().slice(-6),demo:true}; }
+    const fail=msg=>{btn.disabled=false;prog.hidden=true;err.textContent=(ko?'전송 실패. 다시 시도하거나 담당자에게 연락하세요. ':'Илгээж чадсангүй. Дахин оролдоно уу. ')+(msg||'');};
+    let res;
+    try{
+      if(!ENDPOINT){res={ok:true,no:'TEST-'+Date.now().toString().slice(-6),demo:true};}
+      else{
+        progT.textContent=ko?'접수 생성 중…':'Бүртгэл үүсгэж байна…';bar.style.width='5%';
+        const c=await post(Object.assign({action:'create',fileList:all.map(x=>({role:x.role,name:x.f.name,type:x.f.type,size:x.f.size}))},base));
+        if(!c.ok)return fail(c.error);
+        const counters={};
+        for(let i=0;i<all.length;i++){
+          const x=all[i]; counters[x.role]=(counters[x.role]||0)+1;
+          progT.textContent=(ko?'파일 올리는 중 ':'Файл илгээж байна ')+(i+1)+'/'+all.length+' · '+x.f.name;
+          bar.style.width=Math.round(5+85*(i)/all.length)+'%';
+          const f=await shrink(x.f); const data=await toB64(f);
+          let r=null,tries=0; while(tries<2){tries++;try{r=await post({action:'file',no:c.no,folderId:c.folderId,idx:counters[x.role],file:{role:x.role,name:f.name,type:f.type||'application/octet-stream',data}});if(r.ok)break;}catch(ex){r={ok:false,error:String(ex)};}}
+          if(!r||!r.ok)return fail((ko?'파일 전송 실패: ':'Файл илгээгдсэнгүй: ')+x.f.name+' '+(r&&r.error||''));
+        }
+        progT.textContent=ko?'마무리 중…':'Дуусгаж байна…';bar.style.width='95%';
+        res=await post(Object.assign({action:'done',no:c.no,folderId:c.folderId,count:all.length,files:all.map(x=>({role:x.role,name:x.f.name}))},base));
+        if(!res.ok)return fail(res.error);
+      }
+    }catch(ex){return fail(String(ex));}
     bar.style.width='100%';progT.textContent=ko?'완료':'Дууслаа';
     const sum=document.getElementById('summary');sum.innerHTML='';
-    const rows=[[ko?'접수번호':'Бүртгэлийн №',res.no],[ko?'성명':'Нэр',payload.name],[ko?'연락처':'Утас',payload.phone],[ko?'최초 취업일':'Ажилд орсон огноо',payload.hireDate],[ko?'환급계좌':'Данс',payload.bank+' '+payload.acct],[ko?'첨부':'Хавсралт',all.length+(ko?'건':'')],[ko?'입력자':'Оруулсан',payload.proxy||(ko?'본인':'Өөрөө')]];
+    const rows=[[ko?'접수번호':'Бүртгэлийн №',res.no],[ko?'성명':'Нэр',base.name],[ko?'연락처':'Утас',base.phone],[ko?'최초 취업일':'Ажилд орсон огноо',base.hireDate],[ko?'환급계좌':'Данс',base.bank+' '+base.acct],[ko?'첨부':'Хавсралт',all.length+(ko?'건':'')],[ko?'입력자':'Оруулсан',base.proxy||(ko?'본인':'Өөрөө')]];
     rows.forEach(([k,v])=>{const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v;sum.append(dt,dd);});
     if(res.demo)document.getElementById('demoNote').hidden=false;
     e.target.hidden=true;const done=document.getElementById('done');done.hidden=false;done.scrollIntoView({behavior:'smooth',block:'start'});

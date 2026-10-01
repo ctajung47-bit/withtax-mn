@@ -29,63 +29,98 @@ function doPost(e) {
   lock.waitLock(30000);
   try {
     const d = JSON.parse(e.postData.contents);
-    if (!d.name || !d.arc || !d.phone) throw new Error('필수값 누락');
-
-    const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID);
-    const sh = ss.getSheetByName(CONFIG.SHEET_TAB);
-    const now = new Date();
-    const ymd = Utilities.formatDate(now, CONFIG.TZ, 'yyMMdd');
-    const todayCount = sh.getLastRow() > 1
-      ? sh.getRange(2, 1, sh.getLastRow() - 1, 1).getValues().filter(r => String(r[0]).indexOf('WT-' + ymd) === 0).length
-      : 0;
-    const no = 'WT-' + ymd + '-' + String(todayCount + 1).padStart(3, '0');
-
-    // 1) 폴더 + 파일
-    const root = DriveApp.getFolderById(CONFIG.INTAKE_FOLDER_ID);
-    const folder = root.createFolder(no + '_' + d.name.replace(/[\\/:*?"<>|]/g, ' ').trim());
-    const files = d.files || [];
-    const counters = {};
-    files.forEach(f => {
-      const prefix = ROLE_LABEL[f.role] || '90_기타';
-      counters[f.role] = (counters[f.role] || 0) + 1;
-      const ext = (f.name.match(/\.[A-Za-z0-9]+$/) || [''])[0];
-      const base = f.name.replace(/\.[A-Za-z0-9]+$/, '').slice(0, 60);
-      const fname = prefix + (counters[f.role] > 1 ? '-' + counters[f.role] : '') + '_' + base + ext;
-      const blob = Utilities.newBlob(Utilities.base64Decode(f.data), f.type || 'application/octet-stream', fname);
-      folder.createFile(blob);
-    });
-    // 접수 원본 JSON (파일 데이터 제외) 보관
-    const meta = Object.assign({}, d, { files: files.map(f => ({ role: f.role, name: f.name, type: f.type })) });
-    folder.createFile(Utilities.newBlob(JSON.stringify(meta, null, 2), 'application/json', '00_접수정보.json'));
-
-    // 2) 시트 행
-    const row = [
-      no, Utilities.formatDate(now, CONFIG.TZ, 'yyyy-MM-dd HH:mm'), d.name, d.arc, d.arcOld || '', d.phone, d.visa || '', d.addr || '',
-      d.hireDate || '', d.companies || '', d.prev + (d.prevYears ? '(' + d.prevYears + ')' : ''), d.bank || '', d.acct || '',
-      d.htId || '', d.htPw || '', files.length, folder.getUrl(), d.proxy || '본인', d.memo || '', '접수', ''
-    ];
-    sh.appendRow(row);
-
-    // 3) 알림
-    const roleCount = {};
-    files.forEach(f => { roleCount[f.role] = (roleCount[f.role] || 0) + 1; });
-    const body = [
-      '새 접수: ' + no,
-      '성명: ' + d.name, '외국인등록번호: ' + d.arc, '연락처: ' + d.phone, '최초취업일: ' + (d.hireDate || '-'),
-      '근무회사: ' + (d.companies || '-'), '이전환급: ' + d.prev, '계좌: ' + (d.bank || '') + ' ' + (d.acct || ''),
-      '입력자: ' + (d.proxy || '본인'), '첨부: ' + files.length + '건 ' + JSON.stringify(roleCount),
-      '폴더: ' + folder.getUrl(), '대장: ' + ss.getUrl()
-    ].join('\n');
-    if (CONFIG.NOTIFY.length) MailApp.sendEmail(CONFIG.NOTIFY.join(','), '[외국인경정 접수] ' + no + ' ' + d.name, body);
-
-    return ContentService.createTextOutput(JSON.stringify({ ok: true, no: no, folderUrl: folder.getUrl() }))
-      .setMimeType(ContentService.MimeType.JSON);
+    const action = d.action || 'single';
+    let out;
+    if (action === 'create') out = createIntake(d);
+    else if (action === 'file') out = addFile(d);
+    else if (action === 'done') out = finishIntake(d);
+    else out = singleIntake(d);
+    return json(out);
   } catch (err) {
-    return ContentService.createTextOutput(JSON.stringify({ ok: false, error: String(err) }))
-      .setMimeType(ContentService.MimeType.JSON);
+    return json({ ok: false, error: String(err) });
   } finally {
     lock.releaseLock();
   }
+}
+function json(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
+function safeName(s) { return String(s || '').replace(/[\\/:*?"<>|]/g, ' ').trim(); }
+function nextNo(sh, now) {
+  const ymd = Utilities.formatDate(now, CONFIG.TZ, 'yyMMdd');
+  const todayCount = sh.getLastRow() > 1
+    ? sh.getRange(2, 1, sh.getLastRow() - 1, 1).getValues().filter(r => String(r[0]).indexOf('WT-' + ymd) === 0).length
+    : 0;
+  return 'WT-' + ymd + '-' + String(todayCount + 1).padStart(3, '0');
+}
+function rowFor(no, now, d, fileCount, folderUrl, status) {
+  return [
+    no, Utilities.formatDate(now, CONFIG.TZ, 'yyyy-MM-dd HH:mm'), d.name, d.arc, d.arcOld || '', d.phone, d.visa || '', d.addr || '',
+    d.hireDate || '', d.companies || '', d.prev + (d.prevYears ? '(' + d.prevYears + ')' : ''), d.bank || '', d.acct || '',
+    d.htId || '', d.htPw || '', fileCount, folderUrl, d.proxy || '본인', d.memo || '', status, ''
+  ];
+}
+function saveFile(folder, f, idx) {
+  const prefix = ROLE_LABEL[f.role] || '90_기타';
+  const ext = (f.name.match(/\.[A-Za-z0-9]+$/) || [''])[0];
+  const base = f.name.replace(/\.[A-Za-z0-9]+$/, '').slice(0, 60);
+  const fname = prefix + (idx > 1 ? '-' + idx : '') + '_' + base + ext;
+  folder.createFile(Utilities.newBlob(Utilities.base64Decode(f.data), f.type || 'application/octet-stream', fname));
+  return fname;
+}
+function notify(no, d, files, folder, ss) {
+  const roleCount = {};
+  files.forEach(f => { roleCount[f.role] = (roleCount[f.role] || 0) + 1; });
+  const body = [
+    '새 접수: ' + no,
+    '성명: ' + d.name, '외국인등록번호: ' + d.arc, '연락처: ' + d.phone, '최초취업일: ' + (d.hireDate || '-'),
+    '근무회사: ' + (d.companies || '-'), '이전환급: ' + d.prev, '계좌: ' + (d.bank || '') + ' ' + (d.acct || ''),
+    '입력자: ' + (d.proxy || '본인'), '첨부: ' + files.length + '건 ' + JSON.stringify(roleCount),
+    '폴더: ' + folder.getUrl(), '대장: ' + ss.getUrl()
+  ].join('\n');
+  if (CONFIG.NOTIFY.length) MailApp.sendEmail(CONFIG.NOTIFY.join(','), '[외국인경정 접수] ' + no + ' ' + d.name, body);
+}
+
+/** 1단계: 접수 생성 (폴더 + 시트 행 '업로드중') */
+function createIntake(d) {
+  if (!d.name || !d.arc || !d.phone) throw new Error('필수값 누락');
+  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID), sh = ss.getSheetByName(CONFIG.SHEET_TAB);
+  const now = new Date(), no = nextNo(sh, now);
+  const folder = DriveApp.getFolderById(CONFIG.INTAKE_FOLDER_ID).createFolder(no + '_' + safeName(d.name));
+  const meta = Object.assign({}, d, { no: no, files: d.fileList || [] });
+  folder.createFile(Utilities.newBlob(JSON.stringify(meta, null, 2), 'application/json', '00_접수정보.json'));
+  sh.appendRow(rowFor(no, now, d, 0, folder.getUrl(), '업로드중'));
+  return { ok: true, no: no, folderId: folder.getId(), folderUrl: folder.getUrl() };
+}
+/** 2단계: 파일 1개 추가 */
+function addFile(d) {
+  const folder = DriveApp.getFolderById(d.folderId);
+  const fname = saveFile(folder, d.file, d.idx || 1);
+  return { ok: true, saved: fname };
+}
+/** 3단계: 마무리 (시트 상태·첨부수 갱신 + 알림) */
+function finishIntake(d) {
+  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID), sh = ss.getSheetByName(CONFIG.SHEET_TAB);
+  const folder = DriveApp.getFolderById(d.folderId);
+  const vals = sh.getRange(2, 1, Math.max(sh.getLastRow() - 1, 1), 1).getValues();
+  for (let i = 0; i < vals.length; i++) if (vals[i][0] === d.no) {
+    sh.getRange(i + 2, 16).setValue(d.count || 0);
+    sh.getRange(i + 2, 20).setValue('접수');
+  }
+  notify(d.no, d, d.files || [], folder, ss);
+  return { ok: true, no: d.no, folderUrl: folder.getUrl() };
+}
+/** 구버전: 한 번에 전송 */
+function singleIntake(d) {
+  if (!d.name || !d.arc || !d.phone) throw new Error('필수값 누락');
+  const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID), sh = ss.getSheetByName(CONFIG.SHEET_TAB);
+  const now = new Date(), no = nextNo(sh, now);
+  const folder = DriveApp.getFolderById(CONFIG.INTAKE_FOLDER_ID).createFolder(no + '_' + safeName(d.name));
+  const files = d.files || []; const counters = {};
+  files.forEach(f => { counters[f.role] = (counters[f.role] || 0) + 1; saveFile(folder, f, counters[f.role]); });
+  const meta = Object.assign({}, d, { files: files.map(f => ({ role: f.role, name: f.name, type: f.type })) });
+  folder.createFile(Utilities.newBlob(JSON.stringify(meta, null, 2), 'application/json', '00_접수정보.json'));
+  sh.appendRow(rowFor(no, now, d, files.length, folder.getUrl(), '접수'));
+  notify(no, d, files, folder, ss);
+  return { ok: true, no: no, folderUrl: folder.getUrl() };
 }
 
 /** 편집기에서 ▶ 실행해 권한 승인 + 동작 확인용 */
