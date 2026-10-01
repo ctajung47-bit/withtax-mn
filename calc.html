@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="mn">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>예상 환급액 계산 — 박경준 세무사</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: 1040px editorial column; navy hero with portrait, ivory body sections; Mongolian primary / Korean secondary; MN·KO toggle. */
+:root{
+  --navy:#0F1F3D; --navy-2:#17305C; --gold:#C9A24A; --gold-soft:#F3E9CF;
+  --brand:#1B3F8B; --brand-2:#2F8FD6; --brand-soft:#E7EFF6;
+  --ground:#F7F6F2; --surface:#FFFFFF;
+  --ink:#152238; --ink-2:#4A5A73; --ink-3:#7C8AA0; --line:#E2E0D8;
+  --urgent:#B8650E; --urgent-soft:#FDF2E3;
+  --ok:#1E7A4E; --ok-soft:#E4F4EB;
+  --bad:#B4322E; --bad-soft:#FBE9E7;
+  --focus:#2F8FD6;
+  --f-disp:"Noto Serif KR","IBM Plex Sans",serif;
+  --f-mn:"IBM Plex Sans","IBM Plex Sans KR",system-ui,sans-serif;
+  --f-ko:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --navy:#0A1529; --navy-2:#122444; --gold:#D8B45E; --gold-soft:#3A3120;
+    --brand:#7FB2F0; --brand-2:#5CB0EC; --brand-soft:#1B2A40;
+    --ground:#0E1622; --surface:#162131;
+    --ink:#E6ECF4; --ink-2:#AEBBCD; --ink-3:#7F8DA2; --line:#2A384C;
+    --urgent:#F0A850; --urgent-soft:#2E2112;
+    --ok:#5FCB93; --ok-soft:#14291E;
+    --bad:#F28B85; --bad-soft:#36191A;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --navy:#0A1529; --navy-2:#122444; --gold:#D8B45E; --gold-soft:#3A3120;
+  --brand:#7FB2F0; --brand-2:#5CB0EC; --brand-soft:#1B2A40;
+  --ground:#0E1622; --surface:#162131;
+  --ink:#E6ECF4; --ink-2:#AEBBCD; --ink-3:#7F8DA2; --line:#2A384C;
+  --urgent:#F0A850; --urgent-soft:#2E2112;
+  --ok:#5FCB93; --ok-soft:#14291E;
+  --bad:#F28B85; --bad-soft:#36191A;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-mn);font-size:15.5px;line-height:1.6}
+.ko{font-family:var(--f-ko);word-break:keep-all}
+h1,h2,h3{margin:0;line-height:1.25;text-wrap:balance}
+img{max-width:100%}
+
+/* bilingual */
+.t{display:block}
+.t .mn,.t .ko{display:block}
+.t .ko{font-size:.86em;color:var(--ink-3);font-weight:400;margin-top:2px}
+.lang-ko .t .mn{font-size:.86em;color:var(--ink-3);font-weight:400;order:2;margin-top:2px}
+.lang-ko .t .ko{font-size:1em;color:inherit;font-weight:inherit;order:1;margin-top:0}
+.lang-ko .t{display:flex;flex-direction:column}
+.t.inline{display:inline-flex;flex-wrap:wrap;gap:0 4px;align-items:baseline}
+.t.inline .mn,.t.inline .ko{display:inline;margin:0}
+.t.inline .ko::before{content:"· "}
+.lang-ko .t.inline{display:inline-flex;flex-direction:row}
+.lang-ko .t.inline .ko{order:1}.lang-ko .t.inline .mn{order:2}
+.lang-ko .t.inline .ko::before{content:""}
+.lang-ko .t.inline .mn::before{content:"· "}
+
+.wrap{max-width:1040px;margin:0 auto;padding-inline:20px}
+.topbar{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:10}
+.topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px}
+.topbar img{height:42px;width:auto;display:block}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--ground);padding:3px;gap:2px}
+.lang button{font:inherit;font-weight:700;font-size:12.5px;border:0;background:transparent;color:var(--ink-3);padding:5px 12px;border-radius:999px;cursor:pointer}
+.lang button[aria-pressed="true"]{background:var(--navy);color:#fff}
+
+/* hero */
+.hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;border:1px solid rgba(201,162,74,.25);pointer-events:none}
+.hero .wrap{display:grid;grid-template-columns:1.25fr .75fr;gap:40px;align-items:center;padding-block:56px 48px}
+.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
+.eyebrow::before{content:"";width:28px;height:1px;background:var(--gold)}
+.hero h1{font-family:var(--f-disp);font-weight:700;font-size:40px;letter-spacing:-.01em;margin-top:16px;color:#fff}
+.hero h1 .ko{font-family:var(--f-disp)}
+.hero h1 .t .ko,.lang-ko .hero h1 .t .mn{color:rgba(255,255,255,.62);font-size:.6em;font-weight:500;margin-top:8px}
+.hero .lead{margin:18px 0 0;font-size:16px;color:rgba(255,255,255,.8);max-width:52ch}
+.hero .lead .t .ko,.lang-ko .hero .lead .t .mn{color:rgba(255,255,255,.55)}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
+.btn{display:inline-flex;align-items:center;gap:8px;font:inherit;font-weight:700;font-size:14.5px;padding:13px 20px;border-radius:8px;text-decoration:none;cursor:pointer;border:1px solid transparent;line-height:1.2}
+.btn.gold{background:var(--gold);color:var(--navy)}
+.btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
+.btn .t.inline .ko,.lang-ko .btn .t.inline .mn{opacity:.75;color:inherit}
+.portrait{justify-self:end;width:100%;max-width:300px}
+.frame{position:relative;border-radius:14px;overflow:hidden;border:1px solid rgba(201,162,74,.45);box-shadow:0 30px 60px -30px rgba(0,0,0,.6);background:var(--navy-2)}
+.frame img{display:block;width:100%;height:auto;aspect-ratio:320/309;object-fit:cover}
+.frame .cap{padding:12px 14px;border-top:1px solid rgba(201,162,74,.35);background:rgba(10,21,41,.85)}
+.frame .cap b{display:block;font-family:var(--f-disp);font-size:17px;color:#fff}
+.frame .cap span{display:block;font-size:12.5px;color:rgba(255,255,255,.65);margin-top:2px}
+.stats{background:var(--navy-2);border-top:1px solid rgba(255,255,255,.08)}
+.stats .wrap{display:grid;grid-template-columns:repeat(4,1fr);padding-block:0}
+.stat{padding:18px 16px 18px 0;border-right:1px solid rgba(255,255,255,.08);min-width:0}
+.stat:last-child{border-right:0}
+.stat+.stat{padding-left:16px}
+.stat .n{font-family:var(--f-disp);font-size:24px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1.1}
+.stat .t{font-size:12.5px;color:rgba(255,255,255,.8);margin-top:4px}
+.stat .t .ko,.lang-ko .stat .t .mn{color:rgba(255,255,255,.5)}
+
+/* sections */
+section.sec{padding-block:48px}
+.sec-h{display:flex;flex-direction:column;gap:6px;margin-bottom:22px}
+.sec-h .eyebrow{color:var(--brand)}
+.sec-h .eyebrow::before{background:var(--brand)}
+.sec-h h2{font-family:var(--f-disp);font-size:26px;font-weight:700}
+.sec-h h2 .ko,.sec-h h2 .mn{font-family:var(--f-disp)}
+.sec-h h2 .t .ko,.lang-ko .sec-h h2 .t .mn{font-weight:500;font-size:.62em}
+.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.vcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.vcard .ic{width:40px;height:40px;border-radius:10px;background:var(--gold-soft);color:var(--navy);display:grid;place-items:center;font-family:var(--f-disp);font-weight:700;font-size:18px}
+:root[data-theme="dark"] .vcard .ic{color:var(--gold)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .vcard .ic{color:var(--gold)}}
+.vcard h3{font-size:16px}
+.vcard h3 .t .ko,.lang-ko .vcard h3 .t .mn{font-weight:500}
+.vcard p{margin:0;font-size:14px;color:var(--ink-2)}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 20px}
+.card h2{font-size:18px;margin-bottom:12px}
+.card h2 .ko{font-weight:500}
+.sub{font-size:13px;color:var(--ink-3);margin:-6px 0 14px}
+.form{display:flex;flex-direction:column;gap:16px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field>label,.field>.lbl{font-weight:600;font-size:14px}
+.grid2 .field>label+*,.grid2 .field>.lbl+*{margin-top:auto}
+.field input,.field select,.field textarea{font:inherit;font-family:var(--f-ko);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 12px;width:100%;min-width:0}
+input:focus,select:focus,textarea:focus,button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+.hint{font-size:12.5px;color:var(--ink-3)}
+.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.seg label{border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13.5px;cursor:pointer;display:flex;align-items:flex-start;gap:9px;background:var(--surface);min-width:0;line-height:1.3}
+.field .seg input,.seg input{accent-color:var(--brand);margin:3px 0 0;flex:none;width:16px;height:16px;padding:0;border:0;border-radius:0}
+.seg label .t,.fact .t,.deadline .t,.pw .note .t,.proxy>div{flex:1 1 0;min-width:0}
+.seg label .t .mn,.seg label .t .ko{display:block;overflow-wrap:anywhere}
+.seg label .t .ko::before,.lang-ko .seg label .t .mn::before{content:""}
+.seg label:has(input:checked){border-color:var(--brand);background:var(--brand-soft);color:var(--brand);font-weight:600}
+.seg.three{grid-template-columns:repeat(3,1fr)}
+@media (max-width:420px){.seg.three{grid-template-columns:1fr 1fr}}
+
+.won{position:relative}
+.won input{padding-right:40px!important;text-align:right;font-variant-numeric:tabular-nums}
+.won span{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--ink-3);font-size:13px;pointer-events:none}
+.won.sm input{padding:7px 54px 7px 10px!important;font-size:13.5px}
+.won.sm span{font-size:11.5px}
+.paytools{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
+.paytools .won.sm{flex:1 1 150px;min-width:140px}
+.chk{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
+.chk input{accent-color:var(--brand);width:16px;height:16px;margin:0}
+.years{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
+.years .y{display:flex;flex-direction:column;gap:3px;min-width:0}
+.years .y small{font-size:11.5px;color:var(--ink-3);font-weight:600;font-variant-numeric:tabular-nums}
+.years .y input{padding:7px 8px!important;font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
+.years .y.off{opacity:.4}
+@media (max-width:420px){.years{grid-template-columns:repeat(3,1fr)}}
+.extra{border:1px dashed var(--line);border-radius:10px;padding:10px 12px}
+.extra summary{cursor:pointer;font-weight:600;font-size:13.5px;list-style:none;display:flex;justify-content:space-between;gap:8px}
+.extra summary::-webkit-details-marker{display:none}
+.extra summary::after{content:"+";color:var(--ink-3)}
+.extra[open] summary::after{content:"−"}
+.result{border:1px solid var(--brand-2);border-radius:12px;overflow:hidden;background:var(--surface)}
+.rhead{background:var(--brand);color:#fff;padding:12px 14px}
+.rhead .big{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em;line-height:1.2}
+.rhead .lbl2{font-size:12.5px;opacity:.85}
+.tblwrap{overflow-x:auto}
+.rt{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+.rt th,.rt td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
+.rt th:first-child,.rt td:first-child{text-align:left}
+.rt th{font-weight:600;color:var(--ink-3);font-size:11.5px;background:var(--ground)}
+.rt td.g{color:var(--ok);font-weight:700}
+.rt td.m{color:var(--ink-3)}
+.rt tr.tot td{font-weight:700;background:var(--ground)}
+.rsum{padding:10px 14px;display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:13.5px;font-variant-numeric:tabular-nums}
+.rsum .k{color:var(--ink-2)}.rsum .v{text-align:right;font-weight:600}
+.rsum .net{font-size:16px;color:var(--ok);font-weight:700}
+.rsum .fam{color:var(--urgent)}
+#rnote{padding:0 14px 12px}
+
+.verdict{margin-top:0;border-radius:10px;padding:12px 14px;font-size:14px;display:none;gap:10px;align-items:flex-start}
+.verdict.show{display:flex}
+.verdict.good{background:var(--ok-soft);border:1px solid var(--ok)}
+.verdict.plain{background:var(--brand-soft);border:1px solid var(--brand-2)}
+.verdict.no{background:var(--bad-soft);border:1px solid var(--bad)}
+.verdict .ic{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff}
+.verdict.good .ic{background:var(--ok)}.verdict.plain .ic{background:var(--brand-2)}.verdict.no .ic{background:var(--bad)}
+.verdict .t{font-weight:600}
+.verdict .yrs{margin-top:4px;font-size:13px;color:var(--ink-2);font-weight:400}
+
+
+
+.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;counter-reset:s}
+.step{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 16px;min-width:0;position:relative}
+.step::before{content:"0" counter(s);font-family:var(--f-disp);font-size:28px;font-weight:700;color:var(--gold);line-height:1;display:block;margin-bottom:10px}
+.step>.t{font-weight:700;font-size:15px}
+.step>.t .ko,.lang-ko .step>.t .mn{font-weight:500}
+.step p{margin:6px 0 0;font-size:13px;color:var(--ink-2)}
+
+.docs{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+.checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.checklist li{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:14px}
+.checklist li::before{content:"✓";flex:none;width:22px;height:22px;border-radius:50%;background:var(--ok-soft);color:var(--ok);font-weight:700;font-size:13px;display:grid;place-items:center;margin-top:1px}
+.checklist li .t{flex:1;min-width:0}
+.contact{background:var(--navy);color:#fff;border-radius:14px;padding:24px 22px;display:flex;flex-direction:column;gap:14px}
+.contact h3{font-family:var(--f-disp);font-size:20px;color:#fff}
+.contact h3 .t .ko,.lang-ko .contact h3 .t .mn{color:rgba(255,255,255,.6);font-weight:500}
+.contact p{margin:0;font-size:14px;color:rgba(255,255,255,.8)}
+.contact p .t .ko,.lang-ko .contact p .t .mn{color:rgba(255,255,255,.5)}
+.crow{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px}
+.crow .k{font-size:12px;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;font-weight:600;flex:none;width:72px}
+.crow .v{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;flex:1;min-width:0}
+.crow .v small{display:block;font-size:12px;font-weight:400;color:rgba(255,255,255,.6)}
+.crow button{font:inherit;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;border-radius:6px;padding:6px 10px;cursor:pointer;flex:none}
+.soon{font-size:12.5px;color:rgba(255,255,255,.55);border-top:1px dashed rgba(255,255,255,.2);padding-top:12px}
+
+.faq details{border-top:1px solid var(--line);padding:14px 0}
+.faq details:last-of-type{border-bottom:1px solid var(--line)}
+.faq summary{font-weight:600;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;font-size:15px}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";color:var(--gold);font-weight:400;flex:none;font-size:18px;line-height:1}
+.faq details[open] summary::after{content:"−"}
+.faq .a{margin:10px 0 0;color:var(--ink-2);font-size:14px;max-width:70ch}
+.acct{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
+
+footer{background:var(--surface);border-top:1px solid var(--line);padding-block:28px 40px;font-size:12.5px;color:var(--ink-3)}
+footer .wrap{display:flex;flex-direction:column;gap:6px}
+footer b{color:var(--ink-2);font-weight:600}
+
+@media (max-width:860px){
+  .hero .wrap{grid-template-columns:1fr;gap:28px;padding-block:40px 36px}
+  .portrait{justify-self:start;max-width:260px}
+  .hero h1{font-size:32px}
+  .stats .wrap{grid-template-columns:1fr 1fr}
+  .stat:nth-child(2){border-right:0}.stat:nth-child(3){padding-left:0}
+  .stat{border-bottom:1px solid rgba(255,255,255,.08)}.stat:nth-child(n+3){border-bottom:0}
+  .cards3,.steps{grid-template-columns:1fr 1fr}
+  .two,.docs{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+  .cards3,.steps,.grid2{grid-template-columns:1fr}
+  .hero h1{font-size:27px}
+  .stats .wrap{grid-template-columns:1fr 1fr}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
+</style>
+<style>
+.nav{display:flex;gap:4px;margin-left:auto;margin-right:12px}
+.nav a{font-size:13.5px;font-weight:600;color:var(--ink-2);text-decoration:none;padding:6px 10px;border-radius:6px}
+.nav a:hover{background:var(--ground);color:var(--ink)}
+.nav a .t.inline .ko{display:none}
+.lang-ko .nav a .t.inline .ko{display:inline}
+.lang-ko .nav a .t.inline .mn{display:none}
+.nav a .t.inline .mn::before,.nav a .t.inline .ko::before{content:""}
+@media (max-width:480px){.nav a{padding:6px 7px;font-size:12.5px}.topbar img{height:34px}}
+.page{max-width:760px;margin:0 auto;padding:36px 20px 80px}
+.page-h{margin-bottom:22px}
+.page-h h1{font-family:var(--f-disp);font-size:28px;font-weight:700}
+.page-h h1 .ko,.page-h h1 .mn{font-family:var(--f-disp)}
+.page-h h1 .t .ko,.lang-ko .page-h h1 .t .mn{font-size:.6em;font-weight:500}
+.page-h p{margin:8px 0 0;color:var(--ink-2);font-size:14.5px}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="wrap">
+    <img src="data:image/png;base64,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" alt="세무법인 위드택스">
+    <nav class="nav"><a href="index.html">Home</a><a href="calc.html"><span class="t inline"><span class="mn">Тооцоо</span><span class="ko">계산</span></span></a><a href="apply.html"><span class="t inline"><span class="mn">Бүртгэл</span><span class="ko">접수</span></span></a></nav>
+    <div class="lang" role="group" aria-label="Хэл / 언어">
+      <button type="button" id="btnMn" aria-pressed="true">Монгол</button>
+      <button type="button" id="btnKo" aria-pressed="false">한국어</button>
+    </div>
+  </div>
+</header>
+<main class="page">
+  <div class="page-h">
+    <div class="eyebrow" style="color:var(--brand)">Calculator</div>
+    <h1><span class="t"><span class="mn">Урьдчилсан буцаалтын тооцоо</span><span class="ko">예상 환급액 계산</span></span></h1>
+    <p><span class="t"><span class="mn">Үнэгүй, үүрэг хүлээхгүй. Буцаалт гарахгүй бол ямар ч зардал байхгүй.</span><span class="ko">조회는 무료이며 의무가 없습니다. 환급이 불가능한 경우에도 비용은 전혀 없습니다.</span></span></p>
+  </div>
+  <section class="card" id="check" aria-labelledby="checkH">
+    <div class="form">
+      <div class="grid2">
+        <div class="field">
+          <label for="hireYM"><span class="t"><span class="mn">Солонгост анх ажилд орсон сар</span><span class="ko">한국 최초 취업 연월</span></span></label>
+          <input type="month" id="hireYM" min="2012-01" max="2025-12">
+        </div>
+        <div class="field">
+          <label for="hireAge"><span class="t"><span class="mn">Тэр үеийн нас</span><span class="ko">취업 당시 나이(만)</span></span></label>
+          <input id="hireAge" inputmode="numeric" placeholder="25">
+        </div>
+      </div>
+      <div class="field">
+        <div class="lbl"><span class="t"><span class="mn">Ажил олгогчийн салбар</span><span class="ko">근무 회사 업종</span></span></div>
+        <div class="seg" id="industry">
+          <label><input type="radio" name="ind" value="ok"><span class="t"><span class="mn">Үйлдвэрлэл</span><span class="ko">제조업</span></span></label>
+          <label><input type="radio" name="ind" value="ok"><span class="t"><span class="mn">Барилга</span><span class="ko">건설업</span></span></label>
+          <label><input type="radio" name="ind" value="ok"><span class="t"><span class="mn">ХАА · загас</span><span class="ko">농업·어업</span></span></label>
+          <label><input type="radio" name="ind" value="ok"><span class="t"><span class="mn">Худалдаа · тээвэр · хоол</span><span class="ko">도소매·운수·음식점</span></span></label>
+          <label><input type="radio" name="ind" value="no"><span class="t"><span class="mn">Эмнэлэг · санхүү</span><span class="ko">보건·금융</span></span></label>
+          <label><input type="radio" name="ind" value="unk"><span class="t"><span class="mn">Мэдэхгүй</span><span class="ko">모름</span></span></label>
+        </div>
+      </div>
+      <div class="field">
+        <label for="pay"><span class="t"><span class="mn">Жилийн нийт цалин (татвар суутгахын өмнөх)</span><span class="ko">연간 총급여 (세전, 상여 포함)</span></span></label>
+        <div class="won"><input id="pay" inputmode="numeric" placeholder="30,000,000"><span>₩</span></div>
+        <div class="paytools">
+          <span class="hint"><span class="t inline"><span class="mn">Сарын цалин × 12 ≈</span><span class="ko">월급 × 12 =</span></span></span>
+          <div class="won sm"><input id="monthly" inputmode="numeric" placeholder="2,500,000"><span>₩/сар</span></div>
+          <label class="chk"><input type="checkbox" id="perYear"><span class="t inline"><span class="mn">Жил бүр өөр</span><span class="ko">연도별로 다름</span></span></label>
+        </div>
+        <div class="years" id="payYears" hidden></div>
+      </div>
+      <details class="extra" id="extra">
+        <summary><span class="t inline"><span class="mn">Нэмэлт хөнгөлөлт (гэр бүл) — бичиг баримт шаардана</span><span class="ko">추가 공제 (가족) — 서류 필요</span></span></summary>
+        <div class="grid2" style="margin-top:10px">
+          <div class="field"><label for="spouse"><span class="t"><span class="mn">Эхнэр / нөхөр (орлогогүй)</span><span class="ko">배우자 (소득 없음)</span></span></label>
+            <select id="spouse"><option value="0">Үгүй · 무</option><option value="1">Тийм · 유</option></select></div>
+          <div class="field"><label for="kids"><span class="t"><span class="mn">Хүүхэд (20 хүртэл)</span><span class="ko">자녀 (20세 이하)</span></span></label>
+            <select id="kids"><option>0</option><option>1</option><option>2</option><option>3</option><option>4</option></select></div>
+        </div>
+        <div class="hint"><span class="t"><span class="mn">Монголын гэр бүлийн гэрчилгээ + орчуулга, нотариат шаардлагатай. Тооцоонд тусад нь харуулна.</span><span class="ko">몽골 가족관계증명서 + 번역·공증 필요. 아래 결과에 별도 표시됩니다.</span></span></div>
+      </details>
+      <div class="result" id="result" hidden>
+        <div class="rhead" id="rhead"></div>
+        <div class="tblwrap"><table class="rt" id="rt"></table></div>
+        <div class="rsum" id="rsum"></div>
+        <div class="hint" id="rnote"></div>
+      </div>
+      <div class="verdict" id="verdict"><div class="ic" id="vIc"></div><div><div class="t" id="vT"></div><div class="yrs" id="vY"></div></div></div>
+    </div>
+  </section>
+  <div style="margin-top:22px;display:flex;gap:10px;flex-wrap:wrap">
+    <a class="btn gold" href="apply.html"><span class="t inline"><span class="mn">Бүртгүүлэх</span><span class="ko">접수하기</span></span></a>
+    <a class="btn ghost" style="color:var(--ink);border-color:var(--line)" href="index.html#contact"><span class="t inline"><span class="mn">Зөвлөгөө авах</span><span class="ko">상담 신청</span></span></a>
+  </div>
+</main>
+<footer>
+  <div class="wrap">
+    <div class="ko"><b>세무법인 위드택스</b> · 서울특별시 강남구 역삼동 · 대표세무사 윤동인 · 02-536-1260</div>
+    <div class="ko">담당 세무사 박경준 · 몽골어 담당 한사라</div>
+    <div class="ko">본 페이지의 계산 결과는 추정치이며, 실제 환급액은 원천징수영수증 등 자료를 기준으로 재계산됩니다.</div>
+  </div>
+</footer>
+<script>
+(function(){
+  const root=document.documentElement;
+  const Y=[2021,2022,2023,2024,2025];
+  function setLang(l){
+    root.classList.toggle('lang-ko',l==='ko');root.lang=l==='ko'?'ko':'mn';
+    document.getElementById('btnMn').setAttribute('aria-pressed',l==='mn');
+    document.getElementById('btnKo').setAttribute('aria-pressed',l==='ko');
+    try{localStorage.setItem('lang',l)}catch(e){}
+    if(typeof calc==='function')calc(); if(typeof renderAll==='function')renderAll();
+  }
+  document.getElementById('btnMn').onclick=()=>setLang('mn');
+  document.getElementById('btnKo').onclick=()=>setLang('ko');
+
+  // ===== estimate calculator =====
+  const fmt0=n=>Math.round(n).toLocaleString('ko-KR');
+  const num=el=>parseInt((el.value||'').replace(/\D/g,''),10)||0;
+  function money(el){el.addEventListener('input',()=>{const v=el.value.replace(/\D/g,'').slice(0,10);el.value=v?parseInt(v,10).toLocaleString('ko-KR'):'';});}
+  const pay=document.getElementById('pay'),monthly=document.getElementById('monthly'),perYear=document.getElementById('perYear'),payYears=document.getElementById('payYears');
+  money(pay);money(monthly);
+  monthly.addEventListener('input',()=>{const m=num(monthly);if(m){pay.value=(m*12).toLocaleString('ko-KR');syncYears();}calc();});
+  pay.addEventListener('input',()=>{syncYears();calc();});
+  Y.forEach(y=>{const d=document.createElement('div');d.className='y';d.innerHTML=`<small>${y}</small><input id="py${y}" inputmode="numeric" placeholder="0">`;payYears.appendChild(d);const i=d.querySelector('input');money(i);i.addEventListener('input',calc);});
+  function syncYears(){if(!perYear.checked)Y.forEach(y=>{document.getElementById('py'+y).value=pay.value;});}
+  perYear.addEventListener('change',()=>{payYears.hidden=!perYear.checked;syncYears();calc();});
+
+  // 소득세 추정 (근로소득 only, 기본공제 본인 + 표준세액공제; 국민연금·건보 공제는 보수적으로 미반영)
+  function earnedDed(g){let d;if(g<=5e6)d=g*.7;else if(g<=15e6)d=3.5e6+(g-5e6)*.4;else if(g<=45e6)d=7.5e6+(g-15e6)*.15;else if(g<=1e8)d=12e6+(g-45e6)*.05;else d=14.75e6+(g-1e8)*.02;return Math.min(d,2e7);}
+  function calcTax(base,y){const br=y>=2023?[[14e6,.06],[50e6,.15],[88e6,.24],[150e6,.35],[300e6,.38],[500e6,.40],[1e9,.42],[Infinity,.45]]:[[12e6,.06],[46e6,.15],[88e6,.24],[150e6,.35],[300e6,.38],[500e6,.40],[1e9,.42],[Infinity,.45]];let t=0,prev=0;for(const [lim,r] of br){if(base>prev){t+=(Math.min(base,lim)-prev)*r;prev=lim;}else break;}return Math.max(0,t);}
+  function earnedCredit(tax,g){let c=tax<=1.3e6?tax*.55:715000+(tax-1.3e6)*.3;let cap=g<=33e6?740000:g<=70e6?Math.max(660000,740000-(g-33e6)*.008):Math.max(500000,660000-(g-70e6)*.005);return Math.min(c,cap);}
+  function yearTax(g,y,extraDed,relief){ // relief: ratio of income eligible 0..1
+    if(g<=0)return {tax:0,calc:0,relief:0};
+    const inc=g-earnedDed(g); const base=Math.max(0,inc-1.5e6-extraDed); const calcT=calcTax(base,y);
+    const cap=y>=2023?2e6:1.5e6; const rel=relief>0?Math.min(calcT*relief*.9,cap):0;
+    const credit=earnedCredit(calcT,g)*(calcT>0?(1-rel/calcT):1);
+    const tax=Math.max(0,calcT-rel-credit-130000);
+    return {tax,calc:calcT,relief:rel};
+  }
+  const vb=document.getElementById('verdict'),vIc=document.getElementById('vIc'),vT=document.getElementById('vT'),vY=document.getElementById('vY');
+  const result=document.getElementById('result');
+  function bi(mn,ko){return `<span class="mn">${mn}</span><span class="ko">${ko}</span>`}
+  function verdict(cls,ic,mn,ko,yrs){vb.className='verdict show '+cls;vIc.textContent=ic;vT.innerHTML=bi(mn,ko);vY.textContent=yrs||'';}
+  function calc(){
+    const ym=document.getElementById('hireYM').value, age=parseInt(document.getElementById('hireAge').value,10);
+    const ind=(document.querySelector('input[name=ind]:checked')||{}).value;
+    const ko=root.classList.contains('lang-ko');
+    if(!ym||isNaN(age)||!ind){vb.className='verdict';result.hidden=true;return;}
+    const hy=+ym.slice(0,4), hm=+ym.slice(5,7);
+    // relief ratio per year
+    let reason=null;
+    if(age>34)reason=['Ажилд орох үед 34-өөс дээш настай тул хөнгөлөлт хамаарахгүй. Зардлын хасалтаар л шалгана.','취업 당시 34세 초과로 감면 대상이 아닙니다. 공제자료 반영분만 검토합니다.'];
+    else if(ind==='no')reason=['Эмнэлэг, санхүүгийн салбар хөнгөлөлтөд хамаарахгүй.','보건·금융업은 감면 제외 업종입니다.'];
+    else if(hy+5<2021||(hy+5===2021&&false))reason=['Хөнгөлөлтийн 5 жил 2021 оноос өмнө дууссан.','감면 5년이 2021년 이전에 끝났습니다.'];
+    const ratio={};Y.forEach(y=>{let r=0;if(!reason){if(y>=hy&&y<hy+5)r=1;else if(y===hy+5)r=hm/12;if(y<2018)r=0;}ratio[y]=r;});
+    const spouse=+document.getElementById('spouse').value, kids=+document.getElementById('kids').value, extra=(spouse+kids)*1.5e6;
+    let rows=[],tot=0,famTot=0,anyPay=false;
+    Y.forEach(y=>{if(y<hy)return;const g=perYear.checked?num(document.getElementById('py'+y)):num(pay);if(!g)return;anyPay=true;
+      const base=yearTax(g,y,0,0), w=yearTax(g,y,0,ratio[y]), f=yearTax(g,y,extra,ratio[y]);
+      const ref=Math.max(0,base.tax-w.tax), fam=Math.max(0,w.tax-f.tax);
+      tot+=ref;famTot+=fam;rows.push({y,g,base:base.tax,w:w.tax,ref,fam,r:ratio[y]});});
+    if(!anyPay){result.hidden=true;
+      if(reason)verdict('plain','i',reason[0],reason[1]);
+      else verdict(ind==='unk'?'plain':'good',ind==='unk'?'?':'✓','Хөнгөлөлт авах боломжтой. Цалингаа оруулбал дүнг харуулна.','감면 요건 충족. 연봉을 입력하면 금액이 나옵니다.');
+      return;}
+    vb.className='verdict';
+    const local=tot*.1, gross=tot+local, fee=Math.round(gross*.22), net=gross-fee;
+    document.getElementById('rhead').innerHTML=`<div class="lbl2">${ko?'예상 환급액 (지방세 포함)':'Урьдчилсан буцаалт (орон нутгийн татвар орсон)'}</div><div class="big">${fmt0(gross)} ₩</div>`;
+    const th=ko?['귀속','총급여','현재 세액','감면 후','예상 환급']:['Он','Цалин','Одоогийн татвар','Хөнгөлөлт','Буцаалт'];
+    let html='<tr>'+th.map(t=>`<th>${t}</th>`).join('')+'</tr>';
+    rows.forEach(r=>{html+=`<tr><td>${r.y}${r.r>0&&r.r<1?` <span class="m">(${Math.round(r.r*12)}${ko?'개월':' сар'})</span>`:''}</td><td class="m">${fmt0(r.g)}</td><td>${fmt0(r.base)}</td><td>${r.r?fmt0(r.w):'<span class="m">—</span>'}</td><td class="${r.ref>0?'g':'m'}">${r.ref>0?'+'+fmt0(r.ref):'0'}</td></tr>`;});
+    html+=`<tr class="tot"><td colspan="4">${ko?'합계 (국세)':'Нийт (улсын татвар)'}</td><td class="g">${fmt0(tot)}</td></tr>`;
+    document.getElementById('rt').innerHTML=html;
+    let sum=`<span class="k">${ko?'지방소득세 10%':'Орон нутгийн татвар 10%'}</span><span class="v">+${fmt0(local)}</span>
+      <span class="k">${ko?'수수료 22% (부가세 포함)':'Хураамж 22% (НӨАТ орсон)'}</span><span class="v">−${fmt0(fee)}</span>
+      <span class="k net">${ko?'예상 실수령':'Таны гарт'}</span><span class="v net">${fmt0(net)} ₩</span>`;
+    if(extra>0)sum+=`<span class="k fam">${ko?'가족 공제 추가 가능 (서류 제출 시)':'Гэр бүлийн хөнгөлөлт (баримт өгвөл)'}</span><span class="v fam">+${fmt0(famTot*1.1)}</span>`;
+    document.getElementById('rsum').innerHTML=sum;
+    document.getElementById('rnote').innerHTML=`<span class="t">${bi('Тооцоолол: цалингийн татварын тодорхойлолтоор дахин тооцно. Компани аль хэдийн хөнгөлөлт хэрэглэсэн жил бол буцаалт багасна. 2020 ба өмнөх он хамаарахгүй.','추정치입니다. 실제 원천징수영수증 기준으로 재계산되며, 회사 연말정산에서 이미 감면을 적용받은 연도는 환급이 줄어듭니다. 2020년 이전분은 제외.')}</span>`+(reason?`<div style="margin-top:6px"><span class="t">${bi(reason[0],reason[1])}</span></div>`:'');
+    result.hidden=false;
+  }
+  ['hireYM','hireAge','spouse','kids'].forEach(id=>document.getElementById(id).addEventListener('input',calc));
+  document.getElementById('industry').addEventListener('change',calc);
+
+
+
+  let l0='mn'; try{l0=localStorage.getItem('lang')||'mn'}catch(e){} setLang(l0);
+})();
+</script>
+</body>
+</html>
