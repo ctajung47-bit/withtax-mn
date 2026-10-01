@@ -270,6 +270,10 @@ footer b{color:var(--ink-2);font-weight:600}
 .slots{display:flex;flex-direction:column;gap:10px}
 .slot{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface)}
 .slot.ok{border-color:var(--ok)}
+.slot.over{border-color:var(--brand);background:var(--brand-soft);border-style:dashed}
+.slot .dz .t.inline .ko{display:none}.lang-ko .slot .dz .t.inline .ko{display:inline}.lang-ko .slot .dz .t.inline .mn{display:none}.slot .dz .t.inline .mn::before,.slot .dz .t.inline .ko::before{content:""}
+.slot .dz{font-size:12px;color:var(--ink-3);margin-top:6px}
+@media (hover:none){.slot .dz{display:none}}
 .slot-h{display:flex;justify-content:space-between;gap:8px;font-weight:600;font-size:14px;margin-bottom:8px}
 .slot-h .t{flex:1;min-width:0}
 .req-tag{color:var(--bad);font-weight:700}
@@ -422,31 +426,37 @@ label.file .t.inline .mn::before,label.file .t.inline .ko::before{content:""}
       <div class="slot" data-role="id_front" data-req="1">
         <div class="slot-h"><span class="t"><span class="mn">Гадаад иргэний үнэмлэх — урд тал</span><span class="ko">외국인등록증 앞면</span></span><span class="req-tag">*</span></div>
         <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span>📷</span><span class="t inline"><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf"><span>＋</span><span class="t inline"><span class="mn">Файл сонгох</span><span class="ko">파일 선택</span></span></label></div>
+        <div class="dz"><span class="t inline"><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
         <ul class="flist"></ul>
       </div>
       <div class="slot" data-role="id_back" data-req="1">
         <div class="slot-h"><span class="t"><span class="mn">Гадаад иргэний үнэмлэх — ар тал</span><span class="ko">외국인등록증 뒷면</span></span><span class="req-tag">*</span></div>
         <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span>📷</span><span class="t inline"><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf"><span>＋</span><span class="t inline"><span class="mn">Файл сонгох</span><span class="ko">파일 선택</span></span></label></div>
+        <div class="dz"><span class="t inline"><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
         <ul class="flist"></ul>
       </div>
       <div class="slot" data-role="id_old">
         <div class="slot-h"><span class="t"><span class="mn">Хуучин үнэмлэх (виз солигдсон бол)</span><span class="ko">변경 전 등록증 (체류자격 변경 시)</span></span></div>
         <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span>📷</span><span class="t inline"><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf"><span>＋</span><span class="t inline"><span class="mn">Файл сонгох</span><span class="ko">파일 선택</span></span></label></div>
+        <div class="dz"><span class="t inline"><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
         <ul class="flist"></ul>
       </div>
       <div class="slot" data-role="simplified" data-req="1" data-multi="1">
         <div class="slot-h"><span class="t"><span class="mn">연말정산 간소화자료 PDF — он тус бүр</span><span class="ko">연말정산 간소화자료 PDF — 연도별</span></span><span class="req-tag">*</span></div>
         <div class="slot-b"><label class="file"><input type="file" accept="application/pdf" multiple><span>＋</span><span class="t inline"><span class="mn">PDF сонгох (олон)</span><span class="ko">PDF 선택 (여러 개)</span></span></label></div>
+        <div class="dz"><span class="t inline"><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
         <ul class="flist"></ul>
       </div>
       <div class="slot" data-role="withholding" data-multi="1">
         <div class="slot-h"><span class="t"><span class="mn">원천징수영수증 — он тус бүр</span><span class="ko">근로소득 원천징수영수증 — 연도별</span></span></div>
         <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span>📷</span><span class="t inline"><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf" multiple><span>＋</span><span class="t inline"><span class="mn">Файл сонгох (олон)</span><span class="ko">파일 선택 (여러 개)</span></span></label></div>
+        <div class="dz"><span class="t inline"><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
         <ul class="flist"></ul>
       </div>
       <div class="slot" data-role="other" data-multi="1">
         <div class="slot-h"><span class="t"><span class="mn">Бусад (цалингийн хуудас, гэрээ г.м.)</span><span class="ko">기타 (급여명세서·근로계약서 등)</span></span></div>
         <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span>📷</span><span class="t inline"><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf" multiple><span>＋</span><span class="t inline"><span class="mn">Файл сонгох</span><span class="ko">파일 선택</span></span></label></div>
+        <div class="dz"><span class="t inline"><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
         <ul class="flist"></ul>
       </div>
     </div>
@@ -544,12 +554,22 @@ label.file .t.inline .mn::before,label.file .t.inline .ko::before{content:""}
   function renderAll(){document.querySelectorAll('.slot').forEach(renderSlot);}
   document.querySelectorAll('.slot').forEach(slot=>{
     const role=slot.dataset.role, multi=!!slot.dataset.multi; store[role]=[];
-    slot.querySelectorAll('input[type=file]').forEach(inp=>inp.addEventListener('change',()=>{
-      const err=document.getElementById('err');
-      for(const f of inp.files){ if(f.size>MAX_FILE){err.textContent=(root.classList.contains('lang-ko')?'10MB 초과: ':'10MB-аас их: ')+f.name;continue;}
+    const accept=slot.dataset.role==='simplified'?f=>f.type==='application/pdf':f=>f.type==='application/pdf'||f.type.startsWith('image/');
+    const addFiles=list=>{const err=document.getElementById('err');const ko=root.classList.contains('lang-ko');
+      for(const f of list){ if(!accept(f)){err.textContent=(ko?'PDF 또는 이미지만 가능: ':'Зөвхөн PDF эсвэл зураг: ')+f.name;continue;}
+        if(f.size>MAX_FILE){err.textContent=(ko?'10MB 초과: ':'10MB-аас их: ')+f.name;continue;}
         if(!multi)store[role]=[]; if(!store[role].some(x=>x.name===f.name&&x.size===f.size))store[role].push(f);}
-      inp.value='';renderSlot(slot);}));
+      renderSlot(slot);};
+    slot.querySelectorAll('input[type=file]').forEach(inp=>inp.addEventListener('change',()=>{addFiles(inp.files);inp.value='';}));
+    ['dragenter','dragover'].forEach(ev=>slot.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();slot.classList.add('over');}));
+    ['dragleave','drop'].forEach(ev=>slot.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();slot.classList.remove('over');}));
+    slot.addEventListener('drop',e=>addFiles(e.dataTransfer.files));
+    slot.tabIndex=0;
+    slot.addEventListener('paste',e=>{const fs=[...(e.clipboardData?.files||[])];if(fs.length){e.preventDefault();addFiles(fs.map((f,i)=>f.name&&f.name!=='image.png'?f:new File([f],'paste_'+Date.now()+'_'+i+'.'+(f.type.split('/')[1]||'png'),{type:f.type})));}});
+    slot.addEventListener('click',e=>{if(!e.target.closest('label,button,input'))slot.focus();});
   });
+  // 페이지 어디서든 드롭하면 브라우저가 파일을 열지 않도록
+  ['dragover','drop'].forEach(ev=>document.addEventListener(ev,e=>{if(!e.target.closest('.slot'))e.preventDefault();}));
   const proxy=document.getElementById('proxy'), pf=document.getElementById('proxyFields');
   proxy.addEventListener('change',()=>{pf.hidden=!proxy.checked;});
   document.querySelectorAll('input[name=prev]').forEach(r=>r.addEventListener('change',()=>{document.getElementById('prevYears').hidden=r.value!=='yes'||!r.checked;}));
