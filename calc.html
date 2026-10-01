@@ -289,7 +289,7 @@ footer b{color:var(--ink-2);font-weight:600}
       <div class="grid2">
         <div class="field">
           <label for="hireYM"><span class="t"><span class="mn">Солонгост анх ажилд орсон сар</span><span class="ko">한국 최초 취업 연월</span></span></label>
-          <input type="month" id="hireYM" min="2012-01" max="2025-12">
+          <input id="hireYM" inputmode="numeric" placeholder="201903 → 2019-03" maxlength="7">
         </div>
         <div class="field">
           <label for="hireAge"><span class="t"><span class="mn">Тэр үеийн нас</span><span class="ko">취업 당시 나이(만)</span></span></label>
@@ -394,7 +394,7 @@ footer b{color:var(--ink-2);font-weight:600}
     const ym=document.getElementById('hireYM').value, age=parseInt(document.getElementById('hireAge').value,10);
     const ind=(document.querySelector('input[name=ind]:checked')||{}).value;
     const ko=root.classList.contains('lang-ko');
-    if(!ym||isNaN(age)||!ind){vb.className='verdict';result.hidden=true;return;}
+    if(!/^\d{4}-\d{2}$/.test(ym)||isNaN(age)||!ind){vb.className='verdict';result.hidden=true;return;}
     const hy=+ym.slice(0,4), hm=+ym.slice(5,7);
     // relief ratio per year
     let reason=null;
@@ -428,6 +428,8 @@ footer b{color:var(--ink-2);font-weight:600}
     document.getElementById('rnote').innerHTML=`<span class="t">${bi('Тооцоолол: цалингийн татварын тодорхойлолтоор дахин тооцно. Компани аль хэдийн хөнгөлөлт хэрэглэсэн жил бол буцаалт багасна. 2020 ба өмнөх он хамаарахгүй.','추정치입니다. 실제 원천징수영수증 기준으로 재계산되며, 회사 연말정산에서 이미 감면을 적용받은 연도는 환급이 줄어듭니다. 2020년 이전분은 제외.')}</span>`+(reason?`<div style="margin-top:6px"><span class="t">${bi(reason[0],reason[1])}</span></div>`:'');
     result.hidden=false;
   }
+  const hym=document.getElementById('hireYM');
+  hym.addEventListener('input',()=>{const v=hym.value.replace(/\D/g,'').slice(0,6);hym.value=v.length>4?v.slice(0,4)+'-'+v.slice(4):v;});
   ['hireYM','hireAge','spouse','kids'].forEach(id=>document.getElementById(id).addEventListener('input',calc));
   document.getElementById('industry').addEventListener('change',calc);
 

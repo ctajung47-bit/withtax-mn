@@ -402,7 +402,7 @@ label.file .t.inline .mn::before,label.file .t.inline .ko::before{content:""}
     <h3><span class="t"><span class="mn">2. Ажлын түүх</span><span class="ko">2. 근무 이력</span></span></h3>
     <div class="field">
       <label for="hireDate" class="req"><span class="t"><span class="mn">Солонгост анх ажилд орсон огноо</span><span class="ko">최초 취업일</span></span></label>
-      <input type="date" id="hireDate">
+      <input id="hireDate" inputmode="numeric" placeholder="20190326 → 2019-03-26" maxlength="10">
       <div class="hint"><span class="t"><span class="mn">Хөдөлмөрийн гэрээний огноо. Хөнгөлөлтийн 5 жил эндээс тоологдоно.</span><span class="ko">근로계약일 기준. 감면 5년이 여기서 시작됩니다.</span></span></div>
     </div>
     <div class="field">
@@ -574,6 +574,9 @@ label.file .t.inline .mn::before,label.file .t.inline .ko::before{content:""}
   proxy.addEventListener('change',()=>{pf.hidden=!proxy.checked;});
   document.querySelectorAll('input[name=prev]').forEach(r=>r.addEventListener('change',()=>{document.getElementById('prevYears').hidden=r.value!=='yes'||!r.checked;}));
   ['phone','pxTel'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('input',()=>{const v=el.value.replace(/\D/g,'').slice(0,11);el.value=v.length>7?v.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3'):v.length>3?v.replace(/(\d{3})(\d+)/,'$1-$2'):v;});});
+  const hd=document.getElementById('hireDate');
+  hd.addEventListener('input',()=>{const v=hd.value.replace(/\D/g,'').slice(0,8);hd.value=v.length>6?v.slice(0,4)+'-'+v.slice(4,6)+'-'+v.slice(6):v.length>4?v.slice(0,4)+'-'+v.slice(4):v;});
+  hd.addEventListener('blur',()=>{const m=hd.value.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(hd.value&&(!m||+m[2]<1||+m[2]>12||+m[3]<1||+m[3]>31||+m[1]<2000||+m[1]>2026)){hd.setCustomValidity('x');hd.style.borderColor='var(--bad)';}else{hd.setCustomValidity('');hd.style.borderColor='';}});
   const arc=document.getElementById('arc');arc.addEventListener('input',()=>{const v=arc.value.replace(/\D/g,'').slice(0,13);arc.value=v.length>6?v.slice(0,6)+'-'+v.slice(6):v;});
   const pw=document.getElementById('htPw'),eye=document.getElementById('pwEye');eye.onclick=()=>{const s=pw.type==='password';pw.type=s?'text':'password';eye.textContent=s?'숨김':'보기';};
   const toB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f);});
@@ -582,8 +585,8 @@ label.file .t.inline .mn::before,label.file .t.inline .ko::before{content:""}
     e.preventDefault();
     const err=document.getElementById('err'); const ko=root.classList.contains('lang-ko');
     const g=id=>document.getElementById(id).value.trim();
-    const need=[['name','Овог нэрээ оруулна уу.','영문 성명을 입력하세요.'],['arc','Бүртгэлийн дугаараа оруулна уу.','외국인등록번호를 입력하세요.'],['phone','Утасны дугаараа оруулна уу.','휴대폰 번호를 입력하세요.'],['addr','Хаягаа оруулна уу.','주소를 입력하세요.'],['hireDate','Анх ажилд орсон огноог оруулна уу.','최초 취업일을 입력하세요.'],['acct','Дансны дугаараа оруулна уу.','계좌번호를 입력하세요.']];
-    for(const [id,mn,k] of need){ if(!g(id)){err.textContent=ko?k:mn;document.getElementById(id).focus();return;} }
+    const need=[['name','Овог нэрээ оруулна уу.','영문 성명을 입력하세요.'],['arc','Бүртгэлийн дугаараа оруулна уу.','외국인등록번호를 입력하세요.'],['phone','Утасны дугаараа оруулна уу.','휴대폰 번호를 입력하세요.'],['addr','Хаягаа оруулна уу.','주소를 입력하세요.'],['hireDate','Анх ажилд орсон огноог YYYY-MM-DD хэлбэрээр оруулна уу.','최초 취업일을 2019-03-26 형식으로 입력하세요.'],['acct','Дансны дугаараа оруулна уу.','계좌번호를 입력하세요.']];
+    for(const [id,mn,k] of need){ if(!g(id)||(id==='hireDate'&&!/^\d{4}-\d{2}-\d{2}$/.test(g(id)))){err.textContent=ko?k:mn;document.getElementById(id).focus();return;} }
     if(!g('bank')){err.textContent=ko?'은행을 선택하세요.':'Банкаа сонгоно уу.';return;}
     if(!document.querySelector('input[name=prev]:checked')){err.textContent=ko?'이전 환급 여부를 선택하세요.':'Өмнө буцаалт авсан эсэхээ сонгоно уу.';return;}
     for(const slot of document.querySelectorAll('.slot[data-req]')){ if(!store[slot.dataset.role].length){err.textContent=(ko?'필수 자료 누락: ':'Шаардлагатай баримт дутуу: ')+slot.querySelector('.slot-h .'+(ko?'ko':'mn')).textContent;slot.scrollIntoView({behavior:'smooth',block:'center'});return;} }
