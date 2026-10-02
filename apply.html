@@ -838,8 +838,12 @@ footer .wrap{gap:10px}
         for(let t=0;t<2&&!(r&&r.ok);t++){try{r=await post({action:'file',no:c.no,folderId:c.folderId,idx:counters[x.role],file:{role:x.role,name:f.name,type:f.type||'application/octet-stream',data}});}catch(ex){r=null;}}
         if(!r||!r.ok)return fail();}
       progT.textContent=ko?'마무리 중…':'Дуусгаж байна…';bar.style.width='95%';
-      res=await post(Object.assign({action:'done',no:c.no,folderId:c.folderId,count:all.length,files:all.map(x=>({role:x.role,name:x.f.name}))},base));
-      if(!res||!res.ok)return fail();
+      const doneReq=Object.assign({action:'done',no:c.no,folderId:c.folderId,count:all.length,files:all.map(x=>({role:x.role,name:x.f.name}))},base);
+      res=null;
+      for(let t=0;t<3&&!(res&&res.ok&&res.no===c.no);t++){ // 마무리 단계 자동 재시도 (최대 3회, 3초 간격)
+        if(t)await new Promise(r=>setTimeout(r,3000));
+        try{res=await post(doneReq);}catch(ex){res=null;}}
+      if(!res||!res.ok||res.no!==c.no)return fail();
     }catch(ex){return fail();}
     bar.style.width='100%';progT.textContent=ko?'완료':'Дууслаа';
     const sum=$('summary');sum.innerHTML='';
