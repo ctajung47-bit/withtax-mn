@@ -10,7 +10,7 @@ const CONFIG = {
   INTAKE_FOLDER_ID: '1seSu4MONZJ0NPlPbwDN0Nz-6_oTcbDdj',      // 외국인경정/접수
   SHEET_ID: '1bYZ5BI0jb_2XoYfTe3I5G9cXXrlHQE4xepgAVN2xGIA',  // 관리대장
   SHEET_TAB: '접수',
-  NOTIFY: ['ctajung47@gmail.com'],                            // 알림 받을 메일 — 박경준 주소 추가 예정
+  NOTIFY: ['ctajung47@gmail.com', 'with02@withtax2020.com'],  // 알림 받을 메일
   TZ: 'Asia/Seoul'
 };
 
@@ -112,7 +112,7 @@ function createIntake(d) {
   if (!d.name || !d.arc || !d.phone) throw new Error('필수값 누락');
   const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID), sh = ss.getSheetByName(CONFIG.SHEET_TAB);
   const now = new Date(), no = nextNo(sh, now);
-  const folder = DriveApp.getFolderById(CONFIG.INTAKE_FOLDER_ID).createFolder(no + '_' + safeName(d.name));
+  const folder = DriveApp.getFolderById(CONFIG.INTAKE_FOLDER_ID).createFolder(safeName(d.name) + '_' + no);
   const meta = Object.assign({}, d, { no: no, files: d.fileList || [] });
   folder.createFile(Utilities.newBlob(JSON.stringify(meta, null, 2), 'application/json', '00_접수정보.json'));
   sh.appendRow(rowFor(no, now, d, 0, folder.getUrl(), '업로드중'));
@@ -141,7 +141,7 @@ function singleIntake(d) {
   if (!d.name || !d.arc || !d.phone) throw new Error('필수값 누락');
   const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID), sh = ss.getSheetByName(CONFIG.SHEET_TAB);
   const now = new Date(), no = nextNo(sh, now);
-  const folder = DriveApp.getFolderById(CONFIG.INTAKE_FOLDER_ID).createFolder(no + '_' + safeName(d.name));
+  const folder = DriveApp.getFolderById(CONFIG.INTAKE_FOLDER_ID).createFolder(safeName(d.name) + '_' + no);
   const files = d.files || []; const counters = {};
   files.forEach(f => { counters[f.role] = (counters[f.role] || 0) + 1; saveFile(folder, f, counters[f.role]); });
   const meta = Object.assign({}, d, { files: files.map(f => ({ role: f.role, name: f.name, type: f.type })) });
