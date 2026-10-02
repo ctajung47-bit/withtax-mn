@@ -128,9 +128,12 @@ label.file input{position:absolute;width:1px;height:1px;opacity:0;pointer-events
 .flist li .sz{color:var(--ink-3);font-variant-numeric:tabular-nums;flex:none;font-size:13px}
 .flist li button{border:0;background:transparent;color:var(--ink-2);font-size:20px;cursor:pointer;width:40px;height:40px;flex:none;border-radius:8px}
 .flist li button:hover{background:var(--bad-soft);color:var(--bad)}
-.prog{display:flex;flex-direction:column;gap:6px;font-size:14.5px;color:var(--ink-2)}
-.prog .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
-.prog .bar i{display:block;height:100%;width:0;background:var(--brand);transition:width .2s}
+.prog{display:flex;flex-direction:column;gap:8px;font-size:16px;color:var(--ink-2);padding:16px;border-radius:10px;background:var(--brand-soft)}
+.prog-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.prog-h b{font-size:22px;color:var(--navy);font-variant-numeric:tabular-nums;flex:none}
+.prog .bar{height:14px;border-radius:7px;background:#fff;border:1px solid var(--line);overflow:hidden}
+.prog .bar i{display:block;height:100%;width:0;background:var(--navy);transition:width .3s}
+.prog-hint{font-size:14px;color:var(--ink-3)}
 .summary{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:15px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
 .summary dt{color:var(--ink-3)}.summary dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .agree{display:flex;gap:12px;align-items:flex-start;font-size:15.5px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}

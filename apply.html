@@ -128,9 +128,12 @@ label.file input{position:absolute;width:1px;height:1px;opacity:0;pointer-events
 .flist li .sz{color:var(--ink-3);font-variant-numeric:tabular-nums;flex:none;font-size:13px}
 .flist li button{border:0;background:transparent;color:var(--ink-2);font-size:20px;cursor:pointer;width:40px;height:40px;flex:none;border-radius:8px}
 .flist li button:hover{background:var(--bad-soft);color:var(--bad)}
-.prog{display:flex;flex-direction:column;gap:6px;font-size:14.5px;color:var(--ink-2)}
-.prog .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
-.prog .bar i{display:block;height:100%;width:0;background:var(--brand);transition:width .2s}
+.prog{display:flex;flex-direction:column;gap:8px;font-size:16px;color:var(--ink-2);padding:16px;border-radius:10px;background:var(--brand-soft)}
+.prog-h{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+.prog-h b{font-size:22px;color:var(--navy);font-variant-numeric:tabular-nums;flex:none}
+.prog .bar{height:14px;border-radius:7px;background:#fff;border:1px solid var(--line);overflow:hidden}
+.prog .bar i{display:block;height:100%;width:0;background:var(--navy);transition:width .3s}
+.prog-hint{font-size:14px;color:var(--ink-3)}
 .summary{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:15px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
 .summary dt{color:var(--ink-3)}.summary dd{margin:0;min-width:0;overflow-wrap:anywhere}
 .agree{display:flex;gap:12px;align-items:flex-start;font-size:15.5px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
@@ -701,7 +704,7 @@ footer .wrap{gap:10px}
         <div class="agree"><input type="checkbox" id="agree2"><div><label for="agree2"><b><span class="t "><span class="mn">[Заавал]</span><span class="ko">[필수]</span></span></b> <span class="t "><span class="mn">Татварын төлөөлөгчөөр 세무법인 위드택스-ийг томилохыг зөвшөөрч байна (мэдүүлэг гаргахын өмнө дахин баталгаажуулна).</span><span class="ko">세무대리인으로 세무법인 위드택스를 선임하는 데 동의합니다 (실제 신고 전 다시 확인합니다).</span></span></label></div></div>
         <div class="err" id="err3" role="alert"></div>
         <button class="btn gold block" type="submit" id="submitBtn"><span class="t "><span class="mn">Бүртгүүлэх</span><span class="ko">접수하기</span></span></button>
-        <div class="prog" id="prog" hidden><div class="bar"><i id="bar"></i></div><span id="progT"></span></div>
+        <div class="prog" id="prog" hidden><div class="prog-h"><span id="progT"></span><b id="progP">0%</b></div><div class="bar"><i id="bar"></i></div><span class="prog-hint"><span class="t "><span class="mn">Илгээж дуустал хуудсыг хаахгүй байна уу.</span><span class="ko">전송이 끝날 때까지 화면을 닫지 마세요.</span></span></span></div>
         <div class="navrow"><button type="button" class="btn ghost" data-go="2"><span class="t "><span class="mn">Өмнөх</span><span class="ko">이전</span></span></button></div>
         <p class="note"><span class="t "><span class="mn">Бүртгэлийн дараа хариуцагч баримтыг шалгаад холбогдоно.</span><span class="ko">접수 후 담당자가 자료를 확인하고 연락드립니다.</span></span></p>
       </div>
@@ -810,6 +813,7 @@ footer .wrap{gap:10px}
   const pw=$('htPw'),eye=$('pwEye');eye.onclick=()=>{const s=pw.type==='password';pw.type=s?'text':'password';eye.textContent=L()==='ko'?(s?'숨김':'보기'):(s?'Нуух':'Харах');};
   // ---- submit ----
   const toB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f);});
+  const postProg=(obj,onProg)=>new Promise((res,rej)=>{const xhr=new XMLHttpRequest();xhr.open('POST',ENDPOINT);xhr.setRequestHeader('Content-Type','text/plain;charset=utf-8');xhr.upload.onprogress=e=>{if(e.lengthComputable)onProg(e.loaded/e.total);};xhr.onload=()=>{try{res(JSON.parse(xhr.responseText));}catch(e){rej(e);}};xhr.onerror=()=>rej(new Error('net'));xhr.send(JSON.stringify(obj));});
   async function shrink(f){if(!f.type.startsWith('image/')||f.size<700*1024)return f;
     try{const bmp=await createImageBitmap(f);const Lm=2000,s=Math.min(1,Lm/Math.max(bmp.width,bmp.height));const c=document.createElement('canvas');c.width=Math.round(bmp.width*s);c.height=Math.round(bmp.height*s);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
       const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',0.85));if(!blob||blob.size>=f.size)return f;return new File([blob],f.name.replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg'});}catch(e){return f;}}
@@ -823,21 +827,23 @@ footer .wrap{gap:10px}
     const base={lang:L(),name:g('name').toUpperCase(),arc:g('arc'),arcOld:g('arcOld'),phone:g('phone'),visa:g('visa'),addr:g('addr'),hireDate:g('hireDate'),companies:g('companies'),
       prev:document.querySelector('input[name=prev]:checked').value,prevYears:g('prevYears'),bank:g('bank'),acct:g('acct'),htId:g('htId'),htPw:g('htPw'),memo:g('memo'),
       proxy:proxy.checked?(g('pxName')+' '+g('pxTel')).trim():''};
-    const btn=$('submitBtn'),prog=$('prog'),bar=$('bar'),progT=$('progT');
+    const btn=$('submitBtn'),prog=$('prog'),bar=$('bar'),progT=$('progT'),progP=$('progP');const setP=p=>{p=Math.max(0,Math.min(100,Math.round(p)));bar.style.width=p+'%';progP.textContent=p+'%';};
     busy=true;btn.disabled=true;prog.hidden=false;$('err3').textContent='';
     const fail=()=>{busy=false;btn.disabled=false;prog.hidden=true;$('err3').textContent=ko?'전송에 실패했습니다. 입력한 내용은 유지됩니다. 잠시 후 다시 시도하거나 담당자에게 연락해 주세요.':'Илгээж чадсангүй. Оруулсан мэдээлэл хадгалагдсан. Дахин оролдох эсвэл хариуцагчтай холбогдоно уу.';};
     let res;
     try{
-      progT.textContent=ko?'접수 생성 중…':'Бүртгэл үүсгэж байна…';bar.style.width='5%';
+      progT.textContent=ko?'접수 생성 중…':'Бүртгэл үүсгэж байна…';setP(3);
       const c=await post(Object.assign({action:'create',fileList:all.map(x=>({role:x.role,name:x.f.name,type:x.f.type,size:x.f.size}))},base));
       if(!c||!c.ok||!c.no)return fail();
       const counters={};
       for(let i=0;i<all.length;i++){const x=all[i];counters[x.role]=(counters[x.role]||0)+1;
-        progT.textContent=(ko?'파일 올리는 중 ':'Файл илгээж байна ')+(i+1)+'/'+all.length+' · '+x.f.name;bar.style.width=Math.round(5+85*i/all.length)+'%';
+        const p0=5+85*i/all.length,p1=5+85*(i+1)/all.length;
+        progT.textContent=(ko?'파일 올리는 중 ':'Файл илгээж байна ')+(i+1)+'/'+all.length+' · '+x.f.name;setP(p0);
         const f=await shrink(x.f);const data=await toB64(f);let r=null;
-        for(let t=0;t<2&&!(r&&r.ok);t++){try{r=await post({action:'file',no:c.no,folderId:c.folderId,idx:counters[x.role],file:{role:x.role,name:f.name,type:f.type||'application/octet-stream',data}});}catch(ex){r=null;}}
+        for(let t=0;t<2&&!(r&&r.ok);t++){try{r=await postProg({action:'file',no:c.no,folderId:c.folderId,idx:counters[x.role],file:{role:x.role,name:f.name,type:f.type||'application/octet-stream',data}},fr=>setP(p0+(p1-p0)*0.8*fr));}catch(ex){r=null;}}
+        setP(p1);
         if(!r||!r.ok)return fail();}
-      progT.textContent=ko?'마무리 중…':'Дуусгаж байна…';bar.style.width='95%';
+      progT.textContent=ko?'마무리 중…':'Дуусгаж байна…';setP(95);
       const doneReq=Object.assign({action:'done',no:c.no,folderId:c.folderId,count:all.length,files:all.map(x=>({role:x.role,name:x.f.name}))},base);
       res=null;
       for(let t=0;t<3&&!(res&&res.ok&&res.no===c.no);t++){ // 마무리 단계 자동 재시도 (최대 3회, 3초 간격)
@@ -845,7 +851,7 @@ footer .wrap{gap:10px}
         try{res=await post(doneReq);}catch(ex){res=null;}}
       if(!res||!res.ok||res.no!==c.no)return fail();
     }catch(ex){return fail();}
-    bar.style.width='100%';progT.textContent=ko?'완료':'Дууслаа';
+    setP(100);progT.textContent=ko?'완료':'Дууслаа';
     const sum=$('summary');sum.innerHTML='';
     [[ko?'접수번호':'Бүртгэлийн №',res.no],[ko?'성명':'Нэр',base.name],[ko?'휴대폰':'Утас',base.phone],[ko?'환급계좌':'Данс',base.bank+' '+base.acct],[ko?'첨부':'Файл',all.length+(ko?'건':'')],[ko?'입력자':'Оруулсан',base.proxy||(ko?'본인':'Өөрөө')]]
       .forEach(([k,v])=>{const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v;sum.append(dt,dd);});
