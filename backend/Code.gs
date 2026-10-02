@@ -4,13 +4,13 @@
  *   1) 드라이브 접수 폴더에 {접수번호}_{성명} 폴더 생성 + 파일 저장
  *   2) 관리대장 시트 '접수' 탭에 행 추가
  *   3) 담당자 메일 알림
- * 응답: {ok:true, no:'WT-261001-001', folderUrl:'...'}
+ * 응답: {ok:true, no:'261001-001', folderUrl:'...'}
  */
 const CONFIG = {
   INTAKE_FOLDER_ID: '1seSu4MONZJ0NPlPbwDN0Nz-6_oTcbDdj',      // 외국인경정/접수
   SHEET_ID: '1bYZ5BI0jb_2XoYfTe3I5G9cXXrlHQE4xepgAVN2xGIA',  // 관리대장
   SHEET_TAB: '접수',
-  NOTIFY: ['ctajung47@gmail.com', 'with02@withtax2020.com'],  // 알림 받을 메일
+  NOTIFY: ['ctajung47@gmail.com', 'with01@withtax2020.com', 'with02@withtax2020.com'],  // 알림 받을 메일
   TZ: 'Asia/Seoul'
 };
 
@@ -44,12 +44,17 @@ function doPost(e) {
 }
 function json(o) { return ContentService.createTextOutput(JSON.stringify(o)).setMimeType(ContentService.MimeType.JSON); }
 function safeName(s) { return String(s || '').replace(/[\\/:*?"<>|]/g, ' ').trim(); }
+/** 폴더명: 접수번호_성명_생년월일(등록번호 앞6) — 예: 261002-001_GERELKHUU ARIUNBOLD_990430 */
+function folderName(no, d) {
+  const birth = String(d.arc || '').replace(/\D/g, '').slice(0, 6);
+  return no + '_' + safeName(d.name).slice(0, 40) + (birth ? '_' + birth : '');
+}
 function nextNo(sh, now) {
   const ymd = Utilities.formatDate(now, CONFIG.TZ, 'yyMMdd');
   const todayCount = sh.getLastRow() > 1
-    ? sh.getRange(2, 1, sh.getLastRow() - 1, 1).getValues().filter(r => String(r[0]).indexOf('WT-' + ymd) === 0).length
+    ? sh.getRange(2, 1, sh.getLastRow() - 1, 1).getValues().filter(r => String(r[0]).indexOf(ymd) >= 0).length
     : 0;
-  return 'WT-' + ymd + '-' + String(todayCount + 1).padStart(3, '0');
+  return ymd + '-' + String(todayCount + 1).padStart(3, '0');   // 예: 261002-001
 }
 function rowFor(no, now, d, fileCount, folderUrl, status) {
   return [
@@ -71,7 +76,7 @@ function notify(no, d, files, folder, ss) {
   files.forEach(f => { roleCount[f.role] = (roleCount[f.role] || 0) + 1; });
   // 알림에는 민감정보(등록번호·계좌·홈택스) 제외 — 상세는 폴더 링크로 확인
   const lines = [
-    '📥 새 접수 ' + no,
+    '📥 새 접수 ' + no + ' ' + d.name,
     '성명: ' + d.name,
     '연락처: ' + d.phone,
     '최초취업일: ' + (d.hireDate || '-'),
@@ -107,12 +112,18 @@ function testTelegram() {
   Logger.log(r.getContentText());
 }
 
+/** 편집기에서 ▶ 실행: 메일 발송 확인 */
+function testMail() {
+  MailApp.sendEmail(CONFIG.NOTIFY.join(','), '[외국인경정] 메일 알림 연결 확인', '이 메일이 보이면 메일 알림이 정상입니다.\n남은 일일 발송 한도: ' + MailApp.getRemainingDailyQuota());
+  Logger.log('sent to ' + CONFIG.NOTIFY.join(',') + ' / quota ' + MailApp.getRemainingDailyQuota());
+}
+
 /** 1단계: 접수 생성 (폴더 + 시트 행 '업로드중') */
 function createIntake(d) {
   if (!d.name || !d.arc || !d.phone) throw new Error('필수값 누락');
   const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID), sh = ss.getSheetByName(CONFIG.SHEET_TAB);
   const now = new Date(), no = nextNo(sh, now);
-  const folder = DriveApp.getFolderById(CONFIG.INTAKE_FOLDER_ID).createFolder(safeName(d.name) + '_' + no);
+  const folder = DriveApp.getFolderById(CONFIG.INTAKE_FOLDER_ID).createFolder(folderName(no, d));
   const meta = Object.assign({}, d, { no: no, files: d.fileList || [] });
   folder.createFile(Utilities.newBlob(JSON.stringify(meta, null, 2), 'application/json', '00_접수정보.json'));
   sh.appendRow(rowFor(no, now, d, 0, folder.getUrl(), '업로드중'));
@@ -141,7 +152,7 @@ function singleIntake(d) {
   if (!d.name || !d.arc || !d.phone) throw new Error('필수값 누락');
   const ss = SpreadsheetApp.openById(CONFIG.SHEET_ID), sh = ss.getSheetByName(CONFIG.SHEET_TAB);
   const now = new Date(), no = nextNo(sh, now);
-  const folder = DriveApp.getFolderById(CONFIG.INTAKE_FOLDER_ID).createFolder(safeName(d.name) + '_' + no);
+  const folder = DriveApp.getFolderById(CONFIG.INTAKE_FOLDER_ID).createFolder(folderName(no, d));
   const files = d.files || []; const counters = {};
   files.forEach(f => { counters[f.role] = (counters[f.role] || 0) + 1; saveFile(folder, f, counters[f.role]); });
   const meta = Object.assign({}, d, { files: files.map(f => ({ role: f.role, name: f.name, type: f.type })) });
