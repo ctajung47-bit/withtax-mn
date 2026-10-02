@@ -1217,7 +1217,8 @@ def APPLY():
   const pw=$('htPw'),eye=$('pwEye');eye.onclick=()=>{const s=pw.type==='password';pw.type=s?'text':'password';eye.textContent=L()==='ko'?(s?'숨김':'보기'):(s?'Нуух':'Харах');};
   // ---- submit ----
   const toB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f);});
-  const postProg=(obj,onProg)=>new Promise((res,rej)=>{const xhr=new XMLHttpRequest();xhr.open('POST',ENDPOINT);xhr.setRequestHeader('Content-Type','text/plain;charset=utf-8');xhr.upload.onprogress=e=>{if(e.lengthComputable)onProg(e.loaded/e.total);};xhr.onload=()=>{try{res(JSON.parse(xhr.responseText));}catch(e){rej(e);}};xhr.onerror=()=>rej(new Error('net'));xhr.send(JSON.stringify(obj));});
+  // 주의: XHR upload.onprogress 는 CORS 사전요청(OPTIONS)을 유발해 Apps Script에서 실패함 → fetch 유지, 진행률은 크기 기반 추정
+  const postEst=(obj,bytes,onProg)=>{const est=1500+bytes/150000;const t0=Date.now();const iv=setInterval(()=>{const r=1-Math.exp(-(Date.now()-t0)/est);onProg(Math.min(0.95,r));},150);return post(obj).finally(()=>clearInterval(iv));};
   async function shrink(f){if(!f.type.startsWith('image/')||f.size<700*1024)return f;
     try{const bmp=await createImageBitmap(f);const Lm=2000,s=Math.min(1,Lm/Math.max(bmp.width,bmp.height));const c=document.createElement('canvas');c.width=Math.round(bmp.width*s);c.height=Math.round(bmp.height*s);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
       const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',0.85));if(!blob||blob.size>=f.size)return f;return new File([blob],f.name.replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg'});}catch(e){return f;}}
@@ -1244,7 +1245,7 @@ def APPLY():
         const p0=5+85*i/all.length,p1=5+85*(i+1)/all.length;
         progT.textContent=(ko?'파일 올리는 중 ':'Файл илгээж байна ')+(i+1)+'/'+all.length+' · '+x.f.name;setP(p0);
         const f=await shrink(x.f);const data=await toB64(f);let r=null;
-        for(let t=0;t<2&&!(r&&r.ok);t++){try{r=await postProg({action:'file',no:c.no,folderId:c.folderId,idx:counters[x.role],file:{role:x.role,name:f.name,type:f.type||'application/octet-stream',data}},fr=>setP(p0+(p1-p0)*0.8*fr));}catch(ex){r=null;}}
+        for(let t=0;t<2&&!(r&&r.ok);t++){try{r=await postEst({action:'file',no:c.no,folderId:c.folderId,idx:counters[x.role],file:{role:x.role,name:f.name,type:f.type||'application/octet-stream',data}},data.length,fr=>setP(p0+(p1-p0)*0.85*fr));}catch(ex){r=null;}}
         setP(p1);
         if(!r||!r.ok)return fail();}
       progT.textContent=ko?'마무리 중…':'Дуусгаж байна…';setP(95);
