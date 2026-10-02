@@ -10,7 +10,7 @@ const CONFIG = {
   INTAKE_FOLDER_ID: '1seSu4MONZJ0NPlPbwDN0Nz-6_oTcbDdj',      // 외국인경정/접수
   SHEET_ID: '1bYZ5BI0jb_2XoYfTe3I5G9cXXrlHQE4xepgAVN2xGIA',  // 관리대장
   SHEET_TAB: '접수',
-  NOTIFY: ['ctajung47@gmail.com'],                            // 알림 받을 메일 (박경준·한사라 추가)
+  NOTIFY: ['ctajung47@gmail.com'],                            // 알림 받을 메일 — 박경준 주소 추가 예정
   TZ: 'Asia/Seoul'
 };
 
@@ -69,14 +69,42 @@ function saveFile(folder, f, idx) {
 function notify(no, d, files, folder, ss) {
   const roleCount = {};
   files.forEach(f => { roleCount[f.role] = (roleCount[f.role] || 0) + 1; });
-  const body = [
-    '새 접수: ' + no,
-    '성명: ' + d.name, '외국인등록번호: ' + d.arc, '연락처: ' + d.phone, '최초취업일: ' + (d.hireDate || '-'),
-    '근무회사: ' + (d.companies || '-'), '이전환급: ' + d.prev, '계좌: ' + (d.bank || '') + ' ' + (d.acct || ''),
-    '입력자: ' + (d.proxy || '본인'), '첨부: ' + files.length + '건 ' + JSON.stringify(roleCount),
-    '폴더: ' + folder.getUrl(), '대장: ' + ss.getUrl()
-  ].join('\n');
-  if (CONFIG.NOTIFY.length) MailApp.sendEmail(CONFIG.NOTIFY.join(','), '[외국인경정 접수] ' + no + ' ' + d.name, body);
+  // 알림에는 민감정보(등록번호·계좌·홈택스) 제외 — 상세는 폴더 링크로 확인
+  const lines = [
+    '📥 새 접수 ' + no,
+    '성명: ' + d.name,
+    '연락처: ' + d.phone,
+    '최초취업일: ' + (d.hireDate || '-'),
+    '근무회사: ' + (d.companies || '-'),
+    '입력자: ' + (d.proxy || '본인'),
+    '첨부: ' + files.length + '건',
+    '폴더: ' + folder.getUrl(),
+    '대장: ' + ss.getUrl()
+  ];
+  const body = lines.join('\n');
+  // 1) 텔레그램 (토큰·chat id는 스크립트 속성: TG_TOKEN, TG_CHAT_ID)
+  try {
+    const p = PropertiesService.getScriptProperties();
+    const token = p.getProperty('TG_TOKEN'), chat = p.getProperty('TG_CHAT_ID');
+    if (token && chat) UrlFetchApp.fetch('https://api.telegram.org/bot' + token + '/sendMessage', {
+      method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+      payload: JSON.stringify({ chat_id: chat, text: body, disable_web_page_preview: true })
+    });
+  } catch (e) { console.error('telegram: ' + e); }
+  // 2) 이메일
+  try {
+    if (CONFIG.NOTIFY.length) MailApp.sendEmail(CONFIG.NOTIFY.join(','), '[외국인경정 접수] ' + no + ' ' + d.name, body);
+  } catch (e) { console.error('mail: ' + e); }
+}
+
+/** 편집기에서 ▶ 실행: 텔레그램 연결 확인 */
+function testTelegram() {
+  const p = PropertiesService.getScriptProperties();
+  const r = UrlFetchApp.fetch('https://api.telegram.org/bot' + p.getProperty('TG_TOKEN') + '/sendMessage', {
+    method: 'post', contentType: 'application/json', muteHttpExceptions: true,
+    payload: JSON.stringify({ chat_id: p.getProperty('TG_CHAT_ID'), text: '✅ 위드택스 접수 알림 연결 확인' })
+  });
+  Logger.log(r.getContentText());
 }
 
 /** 1단계: 접수 생성 (폴더 + 시트 행 '업로드중') */
