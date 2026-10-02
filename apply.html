@@ -1,564 +1,389 @@
 <!doctype html>
-<html lang="mn">
+<html lang="mn" class="lang-mn">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>온라인 접수 — 박경준 세무사</title>
+<title>온라인 접수 — 세무법인 위드택스</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght@600;700&family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
 <style>
-/* Layout: 1040px editorial column; navy hero with portrait, ivory body sections; Mongolian primary / Korean secondary; MN·KO toggle. */
 :root{
   --navy:#0F1F3D; --navy-2:#17305C; --gold:#C9A24A; --gold-soft:#F3E9CF;
   --brand:#1B3F8B; --brand-2:#2F8FD6; --brand-soft:#E7EFF6;
-  --ground:#F7F6F2; --surface:#FFFFFF;
-  --ink:#152238; --ink-2:#4A5A73; --ink-3:#7C8AA0; --line:#E2E0D8;
-  --urgent:#B8650E; --urgent-soft:#FDF2E3;
-  --ok:#1E7A4E; --ok-soft:#E4F4EB;
-  --bad:#B4322E; --bad-soft:#FBE9E7;
+  --ground:#FAF9F5; --surface:#FFFFFF;
+  --ink:#152238; --ink-2:#44536B; --ink-3:#6F7D93; --line:#E2DFD6;
+  --urgent:#B8650E; --urgent-soft:#FDF2E3; --ok:#1E7A4E; --ok-soft:#E4F4EB; --bad:#B4322E; --bad-soft:#FBE9E7;
   --focus:#2F8FD6;
   --f-disp:"Noto Serif KR","IBM Plex Sans",serif;
-  --f-mn:"IBM Plex Sans","IBM Plex Sans KR",system-ui,sans-serif;
-  --f-ko:"IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
+  --f-body:"IBM Plex Sans","IBM Plex Sans KR","Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    color-scheme:dark;
-    --navy:#0A1529; --navy-2:#122444; --gold:#D8B45E; --gold-soft:#3A3120;
-    --brand:#7FB2F0; --brand-2:#5CB0EC; --brand-soft:#1B2A40;
-    --ground:#0E1622; --surface:#162131;
-    --ink:#E6ECF4; --ink-2:#AEBBCD; --ink-3:#7F8DA2; --line:#2A384C;
-    --urgent:#F0A850; --urgent-soft:#2E2112;
-    --ok:#5FCB93; --ok-soft:#14291E;
-    --bad:#F28B85; --bad-soft:#36191A;
-  }
-}
-:root[data-theme="dark"]{
-  color-scheme:dark;
-  --navy:#0A1529; --navy-2:#122444; --gold:#D8B45E; --gold-soft:#3A3120;
-  --brand:#7FB2F0; --brand-2:#5CB0EC; --brand-soft:#1B2A40;
-  --ground:#0E1622; --surface:#162131;
-  --ink:#E6ECF4; --ink-2:#AEBBCD; --ink-3:#7F8DA2; --line:#2A384C;
-  --urgent:#F0A850; --urgent-soft:#2E2112;
-  --ok:#5FCB93; --ok-soft:#14291E;
-  --bad:#F28B85; --bad-soft:#36191A;
-}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){color-scheme:dark;--navy:#0A1529;--navy-2:#122444;--gold:#D8B45E;--gold-soft:#3A3120;--brand:#7FB2F0;--brand-2:#5CB0EC;--brand-soft:#1B2A40;--ground:#0E1622;--surface:#162131;--ink:#E6ECF4;--ink-2:#AEBBCD;--ink-3:#8795AB;--line:#2A384C;--urgent:#F0A850;--urgent-soft:#2E2112;--ok:#5FCB93;--ok-soft:#14291E;--bad:#F28B85;--bad-soft:#36191A}}
+:root[data-theme="dark"]{color-scheme:dark;--navy:#0A1529;--navy-2:#122444;--gold:#D8B45E;--gold-soft:#3A3120;--brand:#7FB2F0;--brand-2:#5CB0EC;--brand-soft:#1B2A40;--ground:#0E1622;--surface:#162131;--ink:#E6ECF4;--ink-2:#AEBBCD;--ink-3:#8795AB;--line:#2A384C;--urgent:#F0A850;--urgent-soft:#2E2112;--ok:#5FCB93;--ok-soft:#14291E;--bad:#F28B85;--bad-soft:#36191A}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 html{scroll-behavior:smooth}
-body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-mn);font-size:15.5px;line-height:1.6}
-.ko{font-family:var(--f-ko);word-break:keep-all}
-h1,h2,h3{margin:0;line-height:1.25;text-wrap:balance}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.6;overflow-x:hidden}
+h1,h2,h3{margin:0;line-height:1.3;text-wrap:balance;overflow-wrap:anywhere}
+p{margin:0}
 img{max-width:100%}
-
-/* bilingual */
-.t{display:block}
-.t .mn,.t .ko{display:block}
-.t .ko{font-size:.86em;color:var(--ink-3);font-weight:400;margin-top:2px}
-.lang-ko .t .mn{font-size:.86em;color:var(--ink-3);font-weight:400;order:2;margin-top:2px}
-.lang-ko .t .ko{font-size:1em;color:inherit;font-weight:inherit;order:1;margin-top:0}
-.lang-ko .t{display:flex;flex-direction:column}
-.t.inline{display:inline-flex;flex-wrap:wrap;gap:0 4px;align-items:baseline}
-.t.inline .mn,.t.inline .ko{display:inline;margin:0}
-.t.inline .ko::before{content:"· "}
-.lang-ko .t.inline{display:inline-flex;flex-direction:row}
-.lang-ko .t.inline .ko{order:1}.lang-ko .t.inline .mn{order:2}
-.lang-ko .t.inline .ko::before{content:""}
-.lang-ko .t.inline .mn::before{content:"· "}
-
-.wrap{max-width:1040px;margin:0 auto;padding-inline:20px}
+a{color:var(--brand)}
+/* 단일 언어 표시 */
+.t .mn,.t .ko{display:contents}
+html.lang-mn .ko{display:none!important}
+html.lang-ko .mn{display:none!important}
+.wrap{max-width:1000px;margin:0 auto;padding-inline:20px}
 .topbar{background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:env(safe-area-inset-top,0px);z-index:10}
-.topbar .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px;padding-block:10px}
-.topbar img{height:42px;width:auto;display:block}
-.lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--ground);padding:3px;gap:2px}
-.lang button{font:inherit;font-weight:700;font-size:12.5px;border:0;background:transparent;color:var(--ink-3);padding:5px 12px;border-radius:999px;cursor:pointer}
+.topbar .wrap{display:flex;align-items:center;gap:10px;padding-block:10px;flex-wrap:wrap}
+.topbar img{height:38px;width:auto;display:block;flex:none}
+.nav{display:flex;gap:2px;margin-left:auto;flex-wrap:wrap}
+.nav a{font-size:15px;font-weight:600;color:var(--ink-2);text-decoration:none;padding:10px 10px;border-radius:8px;min-height:44px;display:inline-flex;align-items:center}
+.nav a:hover,.nav a[aria-current="page"]{background:var(--ground);color:var(--ink)}
+.lang{display:inline-flex;border:1px solid var(--line);border-radius:999px;background:var(--ground);padding:3px;gap:2px;flex:none}
+.lang button{font:inherit;font-weight:700;font-size:14px;border:0;background:transparent;color:var(--ink-3);padding:8px 14px;border-radius:999px;cursor:pointer;min-height:40px}
 .lang button[aria-pressed="true"]{background:var(--navy);color:#fff}
+@media (max-width:480px){.topbar .wrap{gap:6px}.nav{width:100%;order:3;margin-left:0;justify-content:space-between}.nav a{padding:8px 6px;font-size:14px;flex:1;justify-content:center}}
 
-/* hero */
-.hero{background:var(--navy);color:#fff;position:relative;overflow:hidden}
-.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;border:1px solid rgba(201,162,74,.25);pointer-events:none}
-.hero .wrap{display:grid;grid-template-columns:1.25fr .75fr;gap:40px;align-items:center;padding-block:56px 48px}
-.eyebrow{display:inline-flex;align-items:center;gap:10px;font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);font-weight:600}
-.eyebrow::before{content:"";width:28px;height:1px;background:var(--gold)}
-.hero h1{font-family:var(--f-disp);font-weight:700;font-size:40px;letter-spacing:-.01em;margin-top:16px;color:#fff}
-.hero h1 .ko{font-family:var(--f-disp)}
-.hero h1 .t .ko,.lang-ko .hero h1 .t .mn{color:rgba(255,255,255,.62);font-size:.6em;font-weight:500;margin-top:8px}
-.hero .lead{margin:18px 0 0;font-size:16px;color:rgba(255,255,255,.8);max-width:52ch}
-.hero .lead .t .ko,.lang-ko .hero .lead .t .mn{color:rgba(255,255,255,.55)}
-.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:26px}
-.btn{display:inline-flex;align-items:center;gap:8px;font:inherit;font-weight:700;font-size:14.5px;padding:13px 20px;border-radius:8px;text-decoration:none;cursor:pointer;border:1px solid transparent;line-height:1.2}
-.btn.gold{background:var(--gold);color:var(--navy)}
-.btn.ghost{background:transparent;color:#fff;border-color:rgba(255,255,255,.35)}
-.btn .t.inline .ko,.lang-ko .btn .t.inline .mn{opacity:.75;color:inherit}
-.portrait{justify-self:end;width:100%;max-width:300px}
-.frame{position:relative;border-radius:14px;overflow:hidden;border:1px solid rgba(201,162,74,.45);box-shadow:0 30px 60px -30px rgba(0,0,0,.6);background:var(--navy-2)}
-.frame img{display:block;width:100%;height:auto;aspect-ratio:320/309;object-fit:cover}
-.frame .cap{padding:12px 14px;border-top:1px solid rgba(201,162,74,.35);background:rgba(10,21,41,.85)}
-.frame .cap b{display:block;font-family:var(--f-disp);font-size:17px;color:#fff}
-.frame .cap span{display:block;font-size:12.5px;color:rgba(255,255,255,.65);margin-top:2px}
-.stats{background:var(--navy-2);border-top:1px solid rgba(255,255,255,.08)}
-.stats .wrap{display:grid;grid-template-columns:repeat(4,1fr);padding-block:0}
-.stat{padding:18px 16px 18px 0;border-right:1px solid rgba(255,255,255,.08);min-width:0}
-.stat:last-child{border-right:0}
-.stat+.stat{padding-left:16px}
-.stat .n{font-family:var(--f-disp);font-size:24px;font-weight:700;color:var(--gold);font-variant-numeric:tabular-nums;line-height:1.1}
-.stat .t{font-size:12.5px;color:rgba(255,255,255,.8);margin-top:4px}
-.stat .t .ko,.lang-ko .stat .t .mn{color:rgba(255,255,255,.5)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:inherit;font-weight:700;font-size:16px;padding:12px 22px;min-height:48px;border-radius:10px;text-decoration:none;cursor:pointer;border:1px solid transparent;line-height:1.3;text-align:center;overflow-wrap:anywhere}
+.btn.gold{background:var(--gold);color:#0F1F3D}
+.btn.navy{background:var(--navy);color:#fff}
+.btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.btn.ghost.onnavy{color:#fff;border-color:rgba(255,255,255,.4)}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn.block{width:100%}
+.btn:focus-visible,button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--focus);outline-offset:2px}
 
-/* sections */
-section.sec{padding-block:48px}
-.sec-h{display:flex;flex-direction:column;gap:6px;margin-bottom:22px}
-.sec-h .eyebrow{color:var(--brand)}
-.sec-h .eyebrow::before{background:var(--brand)}
+section.sec{padding-block:44px}
+.sec-h{margin-bottom:20px}
 .sec-h h2{font-family:var(--f-disp);font-size:26px;font-weight:700}
-.sec-h h2 .ko,.sec-h h2 .mn{font-family:var(--f-disp)}
-.sec-h h2 .t .ko,.lang-ko .sec-h h2 .t .mn{font-weight:500;font-size:.62em}
-.cards3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
-.vcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px 18px;display:flex;flex-direction:column;gap:10px;min-width:0}
-.vcard .ic{width:40px;height:40px;border-radius:10px;background:var(--gold-soft);color:var(--navy);display:grid;place-items:center;font-family:var(--f-disp);font-weight:700;font-size:18px}
-:root[data-theme="dark"] .vcard .ic{color:var(--gold)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .vcard .ic{color:var(--gold)}}
-.vcard h3{font-size:16px}
-.vcard h3 .t .ko,.lang-ko .vcard h3 .t .mn{font-weight:500}
-.vcard p{margin:0;font-size:14px;color:var(--ink-2)}
+.sec-h p{margin-top:8px;color:var(--ink-2);font-size:16px;max-width:64ch}
+.lead{color:var(--ink-2);font-size:17px;max-width:60ch}
+.eyebrow{font-size:13px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:700}
+.note{font-size:14px;color:var(--ink-3)}
+.callout{background:var(--urgent-soft);border-left:4px solid var(--urgent);border-radius:8px;padding:12px 14px;font-size:15px}
+.callout.ok{background:var(--ok-soft);border-left-color:var(--ok)}
+.callout.info{background:var(--brand-soft);border-left-color:var(--brand)}
 
-.two{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
-.card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:22px 20px}
-.card h2{font-size:18px;margin-bottom:12px}
-.card h2 .ko{font-weight:500}
-.sub{font-size:13px;color:var(--ink-3);margin:-6px 0 14px}
-.form{display:flex;flex-direction:column;gap:16px}
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media (max-width:760px){.grid3{grid-template-columns:1fr}}
+@media (max-width:520px){.grid2{grid-template-columns:1fr}}
+.item{min-width:0}
+.item h3{font-size:18px;margin-bottom:6px}
+.item p{color:var(--ink-2);font-size:15.5px}
+.num{font-family:var(--f-disp);font-size:26px;font-weight:700;color:var(--gold);line-height:1;margin-bottom:8px}
+
 .field{display:flex;flex-direction:column;gap:6px;min-width:0}
-.field>label,.field>.lbl{font-weight:600;font-size:14px}
-.grid2 .field>label+*,.grid2 .field>.lbl+*{margin-top:auto}
-.field input,.field select,.field textarea{font:inherit;font-family:var(--f-ko);color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:11px 12px;width:100%;min-width:0}
-input:focus,select:focus,textarea:focus,button:focus-visible,summary:focus-visible,a:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
-.hint{font-size:12.5px;color:var(--ink-3)}
+.field>label,.field>.lbl{font-weight:600;font-size:16px}
+.req::after{content:" *";color:var(--bad)}
+.field input,.field select,.field textarea{font:inherit;font-size:16px;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px;width:100%;min-width:0;min-height:48px}
+.field textarea{min-height:88px;resize:vertical}
+.hint{font-size:14px;color:var(--ink-3)}
+.err{color:var(--bad);font-size:15px;font-weight:600;min-height:1.2em}
 .seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.seg label{border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13.5px;cursor:pointer;display:flex;align-items:flex-start;gap:9px;background:var(--surface);min-width:0;line-height:1.3}
-.field .seg input,.seg input{accent-color:var(--brand);margin:3px 0 0;flex:none;width:16px;height:16px;padding:0;border:0;border-radius:0}
-.seg label .t,.fact .t,.deadline .t,.pw .note .t,.proxy>div{flex:1 1 0;min-width:0}
-.seg label .t .mn,.seg label .t .ko{display:block;overflow-wrap:anywhere}
-.seg label .t .ko::before,.lang-ko .seg label .t .mn::before{content:""}
-.seg label:has(input:checked){border-color:var(--brand);background:var(--brand-soft);color:var(--brand);font-weight:600}
 .seg.three{grid-template-columns:repeat(3,1fr)}
+.seg label{border:1px solid var(--line);border-radius:10px;padding:10px 12px;font-size:15.5px;cursor:pointer;display:flex;align-items:flex-start;gap:10px;background:var(--surface);min-width:0;line-height:1.35;min-height:48px}
+.seg input{accent-color:var(--brand);margin:3px 0 0;flex:none;width:18px;height:18px;padding:0;border:0;min-height:0}
+.seg label .t{flex:1;min-width:0;overflow-wrap:anywhere}
+.seg label:has(input:checked){border-color:var(--brand);background:var(--brand-soft);color:var(--brand);font-weight:600}
 @media (max-width:420px){.seg.three{grid-template-columns:1fr 1fr}}
-
 .won{position:relative}
 .won input{padding-right:40px!important;text-align:right;font-variant-numeric:tabular-nums}
-.won span{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--ink-3);font-size:13px;pointer-events:none}
-.won.sm input{padding:7px 54px 7px 10px!important;font-size:13.5px}
-.won.sm span{font-size:11.5px}
-.paytools{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center}
-.paytools .won.sm{flex:1 1 150px;min-width:140px}
-.chk{display:inline-flex;align-items:center;gap:6px;font-size:13px;cursor:pointer}
-.chk input{accent-color:var(--brand);width:16px;height:16px;margin:0}
-.years{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.years .y{display:flex;flex-direction:column;gap:3px;min-width:0}
-.years .y small{font-size:11.5px;color:var(--ink-3);font-weight:600;font-variant-numeric:tabular-nums}
-.years .y input{padding:7px 8px!important;font-size:13px;text-align:right;font-variant-numeric:tabular-nums}
-.years .y.off{opacity:.4}
-@media (max-width:420px){.years{grid-template-columns:repeat(3,1fr)}}
-.extra{border:1px dashed var(--line);border-radius:10px;padding:10px 12px}
-.extra summary{cursor:pointer;font-weight:600;font-size:13.5px;list-style:none;display:flex;justify-content:space-between;gap:8px}
-.extra summary::-webkit-details-marker{display:none}
-.extra summary::after{content:"+";color:var(--ink-3)}
-.extra[open] summary::after{content:"−"}
-.result{border:1px solid var(--brand-2);border-radius:12px;overflow:hidden;background:var(--surface)}
-.rhead{background:var(--brand);color:#fff;padding:12px 14px}
-.rhead .big{font-size:26px;font-weight:700;font-variant-numeric:tabular-nums;letter-spacing:-.01em;line-height:1.2}
-.rhead .lbl2{font-size:12.5px;opacity:.85}
-.tblwrap{overflow-x:auto}
-.rt{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
-.rt th,.rt td{padding:7px 10px;text-align:right;border-bottom:1px solid var(--line);white-space:nowrap}
-.rt th:first-child,.rt td:first-child{text-align:left}
-.rt th{font-weight:600;color:var(--ink-3);font-size:11.5px;background:var(--ground)}
-.rt td.g{color:var(--ok);font-weight:700}
-.rt td.m{color:var(--ink-3)}
-.rt tr.tot td{font-weight:700;background:var(--ground)}
-.rsum{padding:10px 14px;display:grid;grid-template-columns:1fr auto;gap:4px 12px;font-size:13.5px;font-variant-numeric:tabular-nums}
-.rsum .k{color:var(--ink-2)}.rsum .v{text-align:right;font-weight:600}
-.rsum .net{font-size:16px;color:var(--ok);font-weight:700}
-.rsum .fam{color:var(--urgent)}
-#rnote{padding:0 14px 12px}
+.won span{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--ink-3);font-size:14px;pointer-events:none}
 
-.verdict{margin-top:0;border-radius:10px;padding:12px 14px;font-size:14px;display:none;gap:10px;align-items:flex-start}
-.verdict.show{display:flex}
-.verdict.good{background:var(--ok-soft);border:1px solid var(--ok)}
-.verdict.plain{background:var(--brand-soft);border:1px solid var(--brand-2)}
-.verdict.no{background:var(--bad-soft);border:1px solid var(--bad)}
-.verdict .ic{flex:none;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-weight:700;color:#fff}
-.verdict.good .ic{background:var(--ok)}.verdict.plain .ic{background:var(--brand-2)}.verdict.no .ic{background:var(--bad)}
-.verdict .t{font-weight:600}
-.verdict .yrs{margin-top:4px;font-size:13px;color:var(--ink-2);font-weight:400}
-
-
-
-.steps{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;counter-reset:s}
-.step{counter-increment:s;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:18px 16px;min-width:0;position:relative}
-.step::before{content:"0" counter(s);font-family:var(--f-disp);font-size:28px;font-weight:700;color:var(--gold);line-height:1;display:block;margin-bottom:10px}
-.step>.t{font-weight:700;font-size:15px}
-.step>.t .ko,.lang-ko .step>.t .mn{font-weight:500}
-.step p{margin:6px 0 0;font-size:13px;color:var(--ink-2)}
-
-.docs{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
-.checklist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
-.checklist li{display:flex;gap:10px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:14px}
-.checklist li::before{content:"✓";flex:none;width:22px;height:22px;border-radius:50%;background:var(--ok-soft);color:var(--ok);font-weight:700;font-size:13px;display:grid;place-items:center;margin-top:1px}
-.checklist li .t{flex:1;min-width:0}
-.contact{background:var(--navy);color:#fff;border-radius:14px;padding:24px 22px;display:flex;flex-direction:column;gap:14px}
-.contact h3{font-family:var(--f-disp);font-size:20px;color:#fff}
-.contact h3 .t .ko,.lang-ko .contact h3 .t .mn{color:rgba(255,255,255,.6);font-weight:500}
-.contact p{margin:0;font-size:14px;color:rgba(255,255,255,.8)}
-.contact p .t .ko,.lang-ko .contact p .t .mn{color:rgba(255,255,255,.5)}
-.crow{display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:12px 14px}
-.crow .k{font-size:12px;color:var(--gold);letter-spacing:.08em;text-transform:uppercase;font-weight:600;flex:none;width:72px}
-.crow .v{font-size:17px;font-weight:700;font-variant-numeric:tabular-nums;flex:1;min-width:0}
-.crow .v small{display:block;font-size:12px;font-weight:400;color:rgba(255,255,255,.6)}
-.crow button{font:inherit;font-size:12px;font-weight:600;border:1px solid rgba(255,255,255,.3);background:transparent;color:#fff;border-radius:6px;padding:6px 10px;cursor:pointer;flex:none}
-.soon{font-size:12.5px;color:rgba(255,255,255,.55);border-top:1px dashed rgba(255,255,255,.2);padding-top:12px}
-
-.faq details{border-top:1px solid var(--line);padding:14px 0}
-.faq details:last-of-type{border-bottom:1px solid var(--line)}
-.faq summary{font-weight:600;cursor:pointer;list-style:none;display:flex;justify-content:space-between;gap:12px;align-items:flex-start;font-size:15px}
-.faq summary::-webkit-details-marker{display:none}
-.faq summary::after{content:"+";color:var(--gold);font-weight:400;flex:none;font-size:18px;line-height:1}
-.faq details[open] summary::after{content:"−"}
-.faq .a{margin:10px 0 0;color:var(--ink-2);font-size:14px;max-width:70ch}
-.acct{font-variant-numeric:tabular-nums;font-weight:700;color:var(--ink)}
-
-footer{background:var(--surface);border-top:1px solid var(--line);padding-block:28px 40px;font-size:12.5px;color:var(--ink-3)}
+footer{background:var(--surface);border-top:1px solid var(--line);padding-block:28px 44px;font-size:14px;color:var(--ink-3)}
 footer .wrap{display:flex;flex-direction:column;gap:6px}
 footer b{color:var(--ink-2);font-weight:600}
 
-@media (max-width:860px){
-  .hero .wrap{grid-template-columns:1fr;gap:28px;padding-block:40px 36px}
-  .portrait{justify-self:start;max-width:260px}
-  .hero h1{font-size:32px}
-  .stats .wrap{grid-template-columns:1fr 1fr}
-  .stat:nth-child(2){border-right:0}.stat:nth-child(3){padding-left:0}
-  .stat{border-bottom:1px solid rgba(255,255,255,.08)}.stat:nth-child(n+3){border-bottom:0}
-  .cards3,.steps{grid-template-columns:1fr 1fr}
-  .two,.docs{grid-template-columns:1fr}
-}
-@media (max-width:480px){
-  .cards3,.steps,.grid2{grid-template-columns:1fr}
-  .hero h1{font-size:27px}
-  .stats .wrap{grid-template-columns:1fr 1fr}
-}
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
-</style>
-<style>
-.nav{display:flex;gap:4px;margin-left:auto;margin-right:12px}
-.nav a{font-size:13.5px;font-weight:600;color:var(--ink-2);text-decoration:none;padding:6px 10px;border-radius:6px}
-.nav a:hover{background:var(--ground);color:var(--ink)}
-.nav a .t.inline .ko{display:none}
-.lang-ko .nav a .t.inline .ko{display:inline}
-.lang-ko .nav a .t.inline .mn{display:none}
-.nav a .t.inline .mn::before,.nav a .t.inline .ko::before{content:""}
-@media (max-width:480px){.nav a{padding:6px 7px;font-size:12.5px}.topbar img{height:34px}}
-.page{max-width:760px;margin:0 auto;padding:36px 20px 80px}
-.page-h{margin-bottom:22px}
+.page{max-width:760px;margin:0 auto;padding:32px 20px 72px}
 .page-h h1{font-family:var(--f-disp);font-size:28px;font-weight:700}
-.page-h h1 .ko,.page-h h1 .mn{font-family:var(--f-disp)}
-.page-h h1 .t .ko,.lang-ko .page-h h1 .t .mn{font-size:.6em;font-weight:500}
-.page-h p{margin:8px 0 0;color:var(--ink-2);font-size:14.5px}
-</style>
-<style>
-.slots{display:flex;flex-direction:column;gap:10px}
-.slot{border:1px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--surface)}
+.page-h p{margin-top:8px;color:var(--ink-2)}
+.stepbar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:22px 0 18px;counter-reset:st}
+.stepbar div{counter-increment:st;font-size:14px;color:var(--ink-3);padding-top:10px;border-top:4px solid var(--line);min-width:0;word-break:keep-all;overflow-wrap:break-word}
+.stepbar div::before{content:counter(st) ". ";font-weight:700}
+.stepbar div.cur{color:var(--navy);border-top-color:var(--gold);font-weight:700}
+.stepbar div.done{border-top-color:var(--ok);color:var(--ok)}
+.form{display:flex;flex-direction:column;gap:18px}
+.form h2{font-size:20px}
+.form h3{font-size:16px;color:var(--brand);margin-top:4px}
+.form hr{border:0;border-top:1px dashed var(--line);margin:4px 0}
+.navrow{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px}
+.navrow .btn{flex:1 1 160px}
+.slots{display:flex;flex-direction:column;gap:12px}
+.slot{border:1px solid var(--line);border-radius:12px;padding:14px;background:var(--surface)}
 .slot.ok{border-color:var(--ok)}
 .slot.over{border-color:var(--brand);background:var(--brand-soft);border-style:dashed}
-.slot .dz .t.inline .ko{display:none}.lang-ko .slot .dz .t.inline .ko{display:inline}.lang-ko .slot .dz .t.inline .mn{display:none}.slot .dz .t.inline .mn::before,.slot .dz .t.inline .ko::before{content:""}
-.slot .dz{font-size:12px;color:var(--ink-3);margin-top:6px}
-@media (hover:none){.slot .dz{display:none}}
-.slot-h{display:flex;justify-content:space-between;gap:8px;font-weight:600;font-size:14px;margin-bottom:8px}
+.slot-h{display:flex;justify-content:space-between;gap:8px;font-weight:600;font-size:16px;margin-bottom:4px}
 .slot-h .t{flex:1;min-width:0}
-.req-tag{color:var(--bad);font-weight:700}
+.slot-sub{font-size:14px;color:var(--ink-3);margin-bottom:10px}
 .slot-b{display:flex;flex-wrap:wrap;gap:8px}
-label.file{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--brand-2);color:var(--brand);border-radius:8px;padding:8px 12px;font-size:13px;font-weight:600;cursor:pointer;background:var(--surface);position:relative}
+label.file{display:inline-flex;align-items:center;gap:6px;border:1px dashed var(--brand-2);color:var(--brand);border-radius:10px;padding:10px 14px;font-size:15px;font-weight:600;cursor:pointer;background:var(--surface);position:relative;min-height:48px}
 label.file.cam{border-style:solid;background:var(--brand-soft)}
 label.file input{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
-label.file .t.inline .ko{display:none}
-.lang-ko label.file .t.inline .ko{display:inline}
-.lang-ko label.file .t.inline .mn{display:none}
-label.file .t.inline .mn::before,label.file .t.inline .ko::before{content:""}
+.dz{font-size:13px;color:var(--ink-3);margin-top:6px}
+@media (hover:none){.dz{display:none}}
 .flist{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:4px}
 .flist:empty{display:none}
-.flist li{display:flex;align-items:center;gap:8px;font-size:13px;background:var(--ground);border-radius:8px;padding:6px 10px;min-width:0}
-.flist li img{width:34px;height:34px;object-fit:cover;border-radius:5px;flex:none}
-.flist li .pdf{width:34px;height:34px;border-radius:5px;background:var(--bad-soft);color:var(--bad);font-size:10px;font-weight:700;display:grid;place-items:center;flex:none}
-.flist li .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-family:var(--f-ko)}
-.flist li .sz{color:var(--ink-3);font-variant-numeric:tabular-nums;flex:none;font-size:12px}
-.flist li button{border:0;background:transparent;color:var(--ink-3);font-size:16px;cursor:pointer;padding:0 2px;flex:none}
-.prog{display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--ink-2)}
+.flist li{display:flex;align-items:center;gap:8px;font-size:14.5px;background:var(--ground);border-radius:8px;padding:6px 10px;min-width:0}
+.flist li img{width:36px;height:36px;object-fit:cover;border-radius:5px;flex:none}
+.flist li .pdf{width:36px;height:36px;border-radius:5px;background:var(--bad-soft);color:var(--bad);font-size:11px;font-weight:700;display:grid;place-items:center;flex:none}
+.flist li .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.flist li .sz{color:var(--ink-3);font-variant-numeric:tabular-nums;flex:none;font-size:13px}
+.flist li button{border:0;background:transparent;color:var(--ink-2);font-size:20px;cursor:pointer;width:40px;height:40px;flex:none;border-radius:8px}
+.flist li button:hover{background:var(--bad-soft);color:var(--bad)}
+.prog{display:flex;flex-direction:column;gap:6px;font-size:14.5px;color:var(--ink-2)}
 .prog .bar{height:8px;border-radius:4px;background:var(--line);overflow:hidden}
 .prog .bar i{display:block;height:100%;width:0;background:var(--brand);transition:width .2s}
-.done{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:24px 20px}
-.done .ok{width:48px;height:48px;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:grid;place-items:center;margin:0 auto 10px;font-size:24px;font-weight:700}
-.done h2{font-size:19px;text-align:center}
-.done p{margin:6px 0 0;color:var(--ink-2);font-size:14px;text-align:center}
-.done dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:16px 0 0;font-size:13.5px}
-.done dt{color:var(--ink-3)}.done dd{margin:0;font-variant-numeric:tabular-nums;min-width:0;overflow-wrap:anywhere}
-.agree{display:flex;gap:10px;align-items:flex-start;font-size:14px}
-.agree input{width:20px;height:20px;margin-top:2px;accent-color:var(--brand);flex:none}
-.agree details{font-size:12.5px;color:var(--ink-3);margin-top:4px}
-.agree summary{cursor:pointer}
-.err{color:var(--bad);font-size:13px;min-height:1em;font-weight:600}
-.submit{font:inherit;font-weight:700;font-size:17px;background:var(--navy);color:#fff;border:0;border-radius:10px;padding:16px;cursor:pointer;width:100%}
-.submit:disabled{opacity:.5;cursor:wait}
-.submit .t{color:#fff}.submit .t .ko,.lang-ko .submit .t .mn{color:#fff;opacity:.85}
-.after{font-size:12.5px;color:var(--ink-3);text-align:center;margin-top:-6px}
+.summary{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;font-size:15px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px}
+.summary dt{color:var(--ink-3)}.summary dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.agree{display:flex;gap:12px;align-items:flex-start;font-size:15.5px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.agree input{width:22px;height:22px;margin-top:2px;accent-color:var(--brand);flex:none}
+.agree details{font-size:14px;color:var(--ink-3);margin-top:6px}
+.agree summary{cursor:pointer;min-height:28px}
+.done{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:26px 20px}
+.done .ok{width:52px;height:52px;border-radius:50%;background:var(--ok-soft);color:var(--ok);display:grid;place-items:center;margin:0 auto 10px;font-size:26px;font-weight:700}
+.done h2{font-size:21px;text-align:center}
+.done p{margin-top:6px;color:var(--ink-2);text-align:center}
+.pw{background:var(--urgent-soft);border-radius:12px;padding:14px;display:flex;flex-direction:column;gap:10px}
 .pwrow{position:relative}
-.pwrow button{position:absolute;right:6px;top:50%;transform:translateY(-50%);font:inherit;font-size:12px;border:0;background:var(--ground);color:var(--ink-2);border-radius:6px;padding:5px 8px;cursor:pointer}
-.proxy{display:flex;gap:10px;align-items:flex-start;background:var(--ground);border-radius:10px;padding:10px 12px;font-size:14px}
-.proxy input{width:20px;height:20px;accent-color:var(--brand);margin-top:2px;flex:none}
-.proxy .t{font-weight:600}.proxy>div{flex:1;min-width:0}
+.pwrow button{position:absolute;right:6px;top:50%;transform:translateY(-50%);font:inherit;font-size:13px;border:0;background:var(--ground);color:var(--ink-2);border-radius:8px;padding:8px 10px;cursor:pointer;min-height:36px}
+.proxy{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15.5px}
+.proxy input{width:22px;height:22px;accent-color:var(--brand);margin-top:2px;flex:none}
+.proxy>div{flex:1;min-width:0}
 #proxyFields{margin-top:10px}
-.form hr{border:0;border-top:1px dashed var(--line);margin:4px 0}
-.form h3{font-size:15px;color:var(--brand)}
-.form h3 .ko{font-weight:500}
-.pw{background:var(--urgent-soft);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:10px}
-.pw .note{font-size:13px;display:flex;gap:8px;align-items:flex-start}
-.pw .note svg{flex:none;width:18px;height:18px;stroke:var(--urgent);fill:none;stroke-width:2;margin-top:2px}
-.pw .note .t{font-weight:600;flex:1;min-width:0}
-.seg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.seg label{border:1px solid var(--line);border-radius:10px;padding:9px 12px;font-size:13.5px;cursor:pointer;display:flex;align-items:flex-start;gap:9px;background:var(--surface);min-width:0;line-height:1.3}
-.field .seg input,.seg input{accent-color:var(--brand);margin:3px 0 0;flex:none;width:16px;height:16px;padding:0;border:0;border-radius:0}
-.seg label .t{flex:1 1 0;min-width:0}
-.seg label .t .mn,.seg label .t .ko{display:block;overflow-wrap:anywhere}
-.seg label:has(input:checked){border-color:var(--brand);background:var(--brand-soft);color:var(--brand);font-weight:600}
-.seg.three{grid-template-columns:repeat(3,1fr)}
-@media (max-width:420px){.seg.three{grid-template-columns:1fr 1fr}}
 </style>
 <script src="config.js"></script>
 </head>
 <body>
 <header class="topbar">
   <div class="wrap">
-    <img src="data:image/png;base64,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" alt="세무법인 위드택스">
-    <nav class="nav"><a href="index.html">Home</a><a href="calc.html"><span class="t inline"><span class="mn">Буцаалтын урьдчилсан дүн</span><span class="ko">예상 환급액 조회</span></span></a><a href="apply.html"><span class="t inline"><span class="mn">Онлайн бүртгэл</span><span class="ko">온라인 접수</span></span></a></nav>
+    <a href="index.html" style="display:block;flex:none"><img src="data:image/png;base64,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" alt="세무법인 위드택스"></a>
+    <nav class="nav" aria-label="메뉴">
+      <a href="index.html"><span class="t "><span class="mn">Нүүр</span><span class="ko">홈</span></span></a>
+      <a href="calc.html"><span class="t "><span class="mn">Буцаалтын тооцоо</span><span class="ko">예상 환급액 계산</span></span></a>
+      <a href="apply.html" aria-current="page"><span class="t "><span class="mn">Онлайн бүртгэл</span><span class="ko">온라인 접수</span></span></a>
+    </nav>
     <div class="lang" role="group" aria-label="Хэл / 언어">
-      <button type="button" id="btnMn" aria-pressed="true">Монгол</button>
-      <button type="button" id="btnKo" aria-pressed="false">한국어</button>
+      <button type="button" id="btnMn" aria-pressed="true" lang="mn">Монгол</button>
+      <button type="button" id="btnKo" aria-pressed="false" lang="ko">한국어</button>
     </div>
   </div>
 </header>
+
 <main class="page">
   <div class="page-h">
-    <div class="eyebrow" style="color:var(--brand)">Apply</div>
-    <h1><span class="t"><span class="mn">Онлайн бүртгэл</span><span class="ko">온라인 접수</span></span></h1>
-    <p><span class="t"><span class="mn">Мэдээллээ бөглөж, баримтаа хавсаргана уу. Татварын мэргэжилтэн 3 ажлын өдрийн дотор тооцооны тайлан илгээнэ.</span><span class="ko">정보를 입력하고 자료를 첨부하세요. 세무사가 영업일 3일 안에 세액계산 보고서를 보내드립니다.</span></span></p>
+    <h1><span class="t "><span class="mn">Онлайн бүртгэл</span><span class="ko">온라인 접수</span></span></h1>
+    <p><span class="t "><span class="mn">Гурван алхамаар бөглөнө. Өмнөх алхам руу буцсан ч оруулсан мэдээлэл, файл хадгалагдана.</span><span class="ko">3단계로 작성합니다. 이전 단계로 돌아가도 입력한 내용과 첨부파일은 유지됩니다.</span></span></p>
   </div>
-  <form class="card form" id="apply" novalidate>
-    <h2><span class="t"><span class="mn">Бүртгэлийн маягт</span><span class="ko">접수 신청</span></span></h2>
+  <div class="callout" id="offline" hidden><span class="t "><span class="mn">Онлайн бүртгэл одоогоор бэлтгэгдэж байна. Утсаар (02-536-1260) эсвэл хариуцагчтай холбогдоно уу.</span><span class="ko">온라인 접수 기능은 현재 준비 중입니다. 전화(02-536-1260) 또는 담당자에게 문의해 주세요.</span></span></div>
+  <div class="stepbar" aria-label="진행 단계"><div id="sb1" class="cur"><span class="t "><span class="mn">Үндсэн мэдээлэл</span><span class="ko">기본정보</span></span></div><div id="sb2"><span class="t "><span class="mn">Ажлын түүх ба баримт</span><span class="ko">근무 이력과 자료 제출</span></span></div><div id="sb3"><span class="t "><span class="mn">Шалгалт ба зөвшөөрөл</span><span class="ko">최종 확인과 동의</span></span></div></div>
 
-    <div class="proxy">
-      <input type="checkbox" id="proxy">
-      <div style="flex:1">
-        <label for="proxy" class="t"><span class="mn">Хариуцагч ажилтны өмнөөс оруулж байна</span><span class="ko">담당자가 근로자 대신 입력</span></label>
-        <div id="proxyFields" hidden>
+  <form class="form" id="apply" novalidate>
+    <!-- STEP 1 -->
+    <section id="s1">
+      <div class="form">
+        <h2><span class="t "><span class="mn">1. Үндсэн мэдээлэл</span><span class="ko">1. 기본정보</span></span></h2>
+        <div class="proxy"><input type="checkbox" id="proxy"><div><label for="proxy"><span class="t "><span class="mn">Хариуцагч ажилтны өмнөөс оруулж байна</span><span class="ko">담당자가 근로자 대신 입력</span></span></label>
+          <div id="proxyFields" hidden><div class="grid2">
+            <div class="field"><label for="pxName"><span class="t "><span class="mn">Хариуцагчийн нэр</span><span class="ko">담당자 이름</span></span></label><input id="pxName" autocomplete="off"></div>
+            <div class="field"><label for="pxTel"><span class="t "><span class="mn">Хариуцагчийн утас</span><span class="ko">담당자 연락처</span></span></label><input id="pxTel" inputmode="tel" data-ph-mn="010-0000-0000" data-ph-ko="010-0000-0000"></div>
+          </div></div></div></div>
+        <div class="field"><label for="name" class="req"><span class="t "><span class="mn">Овог нэр — гадаад иргэний үнэмлэх дээрх латин үсгээр</span><span class="ko">영문 성명 — 외국인등록증과 똑같이</span></span></label><input id="name" autocomplete="name" data-ph-mn="GERELKHUU ARIUNBOLD" data-ph-ko="GERELKHUU ARIUNBOLD" style="text-transform:uppercase"></div>
+        <div class="grid2">
+          <div class="field"><label for="phone" class="req"><span class="t "><span class="mn">Гар утас</span><span class="ko">휴대폰</span></span></label><input id="phone" inputmode="tel" autocomplete="tel" data-ph-mn="010-0000-0000" data-ph-ko="010-0000-0000"></div>
+          <div class="field"><label for="visa"><span class="t "><span class="mn">Визний төрөл</span><span class="ko">체류자격</span></span></label><select id="visa"><option value="" data-mn="—" data-ko="—">—</option><option>E-9</option><option>E-7</option><option>F-2</option><option>F-4</option><option>F-6</option><option value="other" data-mn="Бусад" data-ko="기타">Бусад</option></select></div>
+        </div>
+        <div class="field"><label for="hireDate" class="req"><span class="t "><span class="mn">Солонгост анх ажилд орсон огноо</span><span class="ko">한국 최초 취업일</span></span></label><input id="hireDate" inputmode="numeric" maxlength="10" data-ph-mn="20190326 → 2019-03-26" data-ph-ko="20190326 → 2019-03-26"><div class="hint"><span class="t "><span class="mn">Хөдөлмөрийн гэрээний огноо. Мэдэхгүй бол ойролцоогоор.</span><span class="ko">근로계약일 기준. 정확히 모르면 대략적으로.</span></span></div></div>
+        <div class="err" id="err1" role="alert"></div>
+        <div class="navrow"><button type="button" class="btn navy" data-go="2"><span class="t "><span class="mn">Дараах</span><span class="ko">다음</span></span></button></div>
+      </div>
+    </section>
+
+    <!-- STEP 2 -->
+    <section id="s2" hidden>
+      <div class="form">
+        <h2><span class="t "><span class="mn">2. Ажлын түүх ба баримт</span><span class="ko">2. 근무 이력과 자료 제출</span></span></h2>
+        <div class="grid2">
+          <div class="field"><label for="arc" class="req"><span class="t "><span class="mn">Гадаад иргэний бүртгэлийн дугаар</span><span class="ko">외국인등록번호</span></span></label><input id="arc" inputmode="numeric" maxlength="14" data-ph-mn="990430-5000000" data-ph-ko="990430-5000000"></div>
+          <div class="field"><label for="arcOld"><span class="t "><span class="mn">Өмнөх дугаар (виз солигдсон бол)</span><span class="ko">이전 외국인등록번호 (체류자격 변경 시)</span></span></label><input id="arcOld" inputmode="numeric" maxlength="14"></div>
+        </div>
+        <div class="field"><label for="addr" class="req"><span class="t "><span class="mn">Одоогийн хаяг (Солонгос)</span><span class="ko">현재 주소 (한국)</span></span></label><input id="addr" autocomplete="street-address" data-ph-mn="경기도 ○○시 ○○로 00, 000호" data-ph-ko="경기도 ○○시 ○○로 00, 000호"></div>
+        <div class="field"><label for="companies"><span class="t "><span class="mn">Ажилласан компаниуд (он, нэр)</span><span class="ko">근무 회사 (연도, 회사명)</span></span></label><textarea id="companies" data-ph-mn="2021~2023 (주)광축&#10;2024~ 유일테크" data-ph-ko="2021~2023 (주)광축&#10;2024~ 유일테크"></textarea></div>
+        <div class="field"><div class="lbl req"><span class="t "><span class="mn">Өмнө нь татварын буцаалт авч байсан уу?</span><span class="ko">이전에 환급 받은 적 있습니까?</span></span></div>
+          <div class="seg three"><label><input type="radio" name="prev" value="no"><span class="t "><span class="mn">Үгүй</span><span class="ko">없음</span></span></label><label><input type="radio" name="prev" value="yes"><span class="t "><span class="mn">Тийм</span><span class="ko">있음</span></span></label><label><input type="radio" name="prev" value="unk"><span class="t "><span class="mn">Мэдэхгүй</span><span class="ko">모름</span></span></label></div>
+          <input id="prevYears" hidden data-ph-mn="2024 оныг хүртэл" data-ph-ko="2024년까지"></div>
+        <hr>
+        <h3><span class="t "><span class="mn">Баримт хавсаргах</span><span class="ko">자료 첨부</span></span></h3>
+        <div class="callout info"><span class="t "><span class="mn">Файлын төрөл: JPG, PNG, PDF. Нэг файл 10MB хүртэл. Зургийг автоматаар багасгаж илгээнэ. Утсаар бол "Зураг авах" дарж шууд зургаа авна.</span><span class="ko">첨부 가능: JPG·PNG·PDF, 파일당 10MB까지. 사진은 자동으로 축소되어 전송됩니다. 휴대폰에서는 "사진 촬영"으로 바로 찍을 수 있습니다.</span></span></div>
+        <div class="slots">
+      <div class="slot" data-role="id_front" data-req="1">
+        <div class="slot-h"><span class="t "><span class="mn">Гадаад иргэний үнэмлэх — урд тал</span><span class="ko">외국인등록증 앞면</span></span><span class="req-tag" style="color:var(--bad)" aria-label="필수">*</span></div>
+        <div class="slot-sub"><span class="t "><span class="mn">Тод, бүтэн харагдахаар</span><span class="ko">글자가 잘 보이게 전체가 나오도록</span></span></div>
+        <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span aria-hidden="true">📷</span><span class="t "><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf"><span aria-hidden="true">＋</span><span class="t "><span class="mn">Файл сонгох</span><span class="ko">파일 선택</span></span></label></div>
+        <div class="dz"><span class="t "><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
+        <ul class="flist"></ul>
+      </div>
+
+      <div class="slot" data-role="id_back" data-req="1">
+        <div class="slot-h"><span class="t "><span class="mn">Гадаад иргэний үнэмлэх — ар тал</span><span class="ko">외국인등록증 뒷면</span></span><span class="req-tag" style="color:var(--bad)" aria-label="필수">*</span></div>
+        <div class="slot-sub"><span class="t "><span class="mn"></span><span class="ko"></span></span></div>
+        <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span aria-hidden="true">📷</span><span class="t "><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf"><span aria-hidden="true">＋</span><span class="t "><span class="mn">Файл сонгох</span><span class="ko">파일 선택</span></span></label></div>
+        <div class="dz"><span class="t "><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
+        <ul class="flist"></ul>
+      </div>
+
+      <div class="slot" data-role="id_old">
+        <div class="slot-h"><span class="t "><span class="mn">Хуучин үнэмлэх</span><span class="ko">변경 전 등록증</span></span><span class="note"><span class="t "><span class="mn">сонголттой</span><span class="ko">선택</span></span></span></div>
+        <div class="slot-sub"><span class="t "><span class="mn">Виз солигдсон бол</span><span class="ko">체류자격이 바뀐 경우만</span></span></div>
+        <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span aria-hidden="true">📷</span><span class="t "><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf"><span aria-hidden="true">＋</span><span class="t "><span class="mn">Файл сонгох</span><span class="ko">파일 선택</span></span></label></div>
+        <div class="dz"><span class="t "><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
+        <ul class="flist"></ul>
+      </div>
+
+      <div class="slot" data-role="simplified" data-multi="1">
+        <div class="slot-h"><span class="t "><span class="mn">Жилийн эцсийн тооцооны баримт PDF (연말정산 간소화자료)</span><span class="ko">연말정산 간소화자료 PDF</span></span><span class="note"><span class="t "><span class="mn">сонголттой</span><span class="ko">선택</span></span></span></div>
+        <div class="slot-sub"><span class="t "><span class="mn">Хоумтаксаас татсан он тус бүрийн PDF. Байхгүй бол хариуцагч тусална.</span><span class="ko">홈택스에서 내려받은 연도별 PDF. 없으면 담당자가 안내합니다.</span></span></div>
+        <div class="slot-b"><label class="file"><input type="file" accept="application/pdf" multiple><span aria-hidden="true">＋</span><span class="t "><span class="mn">Файл сонгох (олон)</span><span class="ko">파일 선택 (여러 개)</span></span></label></div>
+        <div class="dz"><span class="t "><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
+        <ul class="flist"></ul>
+      </div>
+
+      <div class="slot" data-role="withholding" data-multi="1">
+        <div class="slot-h"><span class="t "><span class="mn">Цалингийн татварын тодорхойлолт (원천징수영수증)</span><span class="ko">근로소득 원천징수영수증</span></span><span class="note"><span class="t "><span class="mn">сонголттой</span><span class="ko">선택</span></span></span></div>
+        <div class="slot-sub"><span class="t "><span class="mn">Компаниас авсан он тус бүрийн баримт. Зураг эсвэл PDF.</span><span class="ko">회사에서 받은 연도별 서류. 사진 또는 PDF.</span></span></div>
+        <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span aria-hidden="true">📷</span><span class="t "><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf" multiple><span aria-hidden="true">＋</span><span class="t "><span class="mn">Файл сонгох (олон)</span><span class="ko">파일 선택 (여러 개)</span></span></label></div>
+        <div class="dz"><span class="t "><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
+        <ul class="flist"></ul>
+      </div>
+
+      <div class="slot" data-role="other" data-multi="1">
+        <div class="slot-h"><span class="t "><span class="mn">Бусад</span><span class="ko">기타</span></span><span class="note"><span class="t "><span class="mn">сонголттой</span><span class="ko">선택</span></span></span></div>
+        <div class="slot-sub"><span class="t "><span class="mn">Цалингийн хуудас, гэрээ г.м.</span><span class="ko">급여명세서·근로계약서 등</span></span></div>
+        <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span aria-hidden="true">📷</span><span class="t "><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf" multiple><span aria-hidden="true">＋</span><span class="t "><span class="mn">Файл сонгох (олон)</span><span class="ko">파일 선택 (여러 개)</span></span></label></div>
+        <div class="dz"><span class="t "><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
+        <ul class="flist"></ul>
+      </div>
+
+        </div>
+        <hr>
+        <h3><span class="t "><span class="mn">Хоумтакс (홈택스) нэвтрэх мэдээлэл</span><span class="ko">홈택스 로그인 정보</span></span></h3>
+        <div class="pw">
+          <div class="hint" style="color:var(--ink)"><span class="t "><span class="mn">Жилийн эцсийн тооцооны баримтыг таны бүртгэлээр авахад ашиглана. Мэдэхгүй бол хоосон орхино уу — хариуцагч тусад нь зааварлана. Ажил дууссаны дараа нууц үгээ солихыг зөвлөж байна.</span><span class="ko">연말정산 간소화자료 조회에만 사용합니다. 모르면 비워두세요 — 담당자가 별도로 안내합니다. 작업 완료 후 비밀번호 변경을 권장합니다.</span></span></div>
           <div class="grid2">
-            <div class="field"><label for="pxName"><span class="t"><span class="mn">Хариуцагчийн нэр</span><span class="ko">담당자 이름</span></span></label><input id="pxName" placeholder="한사라"></div>
-            <div class="field"><label for="pxTel"><span class="t"><span class="mn">Утас</span><span class="ko">연락처</span></span></label><input id="pxTel" inputmode="tel" placeholder="010-0000-0000"></div>
+            <div class="field"><label for="htId"><span class="t "><span class="mn">Хоумтакс ID</span><span class="ko">홈택스 아이디</span></span></label><input id="htId" autocomplete="off"></div>
+            <div class="field"><label for="htPw"><span class="t "><span class="mn">Нууц үг</span><span class="ko">비밀번호</span></span></label><div class="pwrow"><input id="htPw" type="password" autocomplete="off"><button type="button" id="pwEye"><span class="t "><span class="mn">Харах</span><span class="ko">보기</span></span></button></div></div>
           </div>
         </div>
+        <div class="err" id="err2" role="alert"></div>
+        <div class="navrow"><button type="button" class="btn ghost" data-go="1"><span class="t "><span class="mn">Өмнөх</span><span class="ko">이전</span></span></button><button type="button" class="btn navy" data-go="3"><span class="t "><span class="mn">Дараах</span><span class="ko">다음</span></span></button></div>
       </div>
-    </div>
+    </section>
 
-    <h3><span class="t"><span class="mn">1. Хувийн мэдээлэл</span><span class="ko">1. 인적사항</span></span></h3>
-    <div class="field">
-      <label for="name" class="req"><span class="t"><span class="mn">Овог нэр — гадаад иргэний үнэмлэх дээрх латин үсгээр</span><span class="ko">영문 성명 — 외국인등록증과 똑같이</span></span></label>
-      <input id="name" autocomplete="name" placeholder="GERELKHUU ARIUNBOLD" style="text-transform:uppercase">
-    </div>
-    <div class="grid2">
-      <div class="field">
-        <label for="arc" class="req"><span class="t"><span class="mn">Гадаад иргэний бүртгэлийн дугаар</span><span class="ko">외국인등록번호</span></span></label>
-        <input id="arc" inputmode="numeric" placeholder="990430-5000000">
+    <!-- STEP 3 -->
+    <section id="s3" hidden>
+      <div class="form">
+        <h2><span class="t "><span class="mn">3. Шалгалт ба зөвшөөрөл</span><span class="ko">3. 최종 확인과 동의</span></span></h2>
+        <div class="field"><div class="lbl req"><span class="t "><span class="mn">Буцаалт хүлээн авах өөрийн нэр дээрх данс</span><span class="ko">환급받을 본인 명의 계좌를 입력해 주세요.</span></span></div>
+          <div class="grid2"><select id="bank" aria-label="은행"><option value="" data-mn="Банк" data-ko="은행">Банк</option><option>국민은행</option><option>신한은행</option><option>우리은행</option><option>하나은행</option><option>농협</option><option>기업은행</option><option>카카오뱅크</option><option>토스뱅크</option><option value="other" data-mn="Бусад" data-ko="기타">Бусад</option></select><input id="acct" inputmode="numeric" aria-label="계좌번호" data-ph-mn="Дансны дугаар" data-ph-ko="계좌번호"></div>
+          <div class="hint"><span class="t "><span class="mn">Татварын алба өөр хүний данс руу шилжүүлдэггүй.</span><span class="ko">국세청은 타인 명의 계좌로 환급하지 않습니다.</span></span></div></div>
+        <div class="field"><label for="memo"><span class="t "><span class="mn">Нэмэлт тайлбар</span><span class="ko">추가 메모</span></span></label><textarea id="memo"></textarea></div>
+        <h3><span class="t "><span class="mn">Оруулсан мэдээлэл</span><span class="ko">입력 내용 확인</span></span></h3>
+        <dl class="summary" id="review"></dl>
+        <div class="agree"><input type="checkbox" id="agree1"><div><label for="agree1"><b><span class="t "><span class="mn">[Заавал]</span><span class="ko">[필수]</span></span></b> <span class="t "><span class="mn">Хувийн мэдээлэл цуглуулж, ашиглахыг зөвшөөрч байна.</span><span class="ko">개인정보 수집·이용에 동의합니다.</span></span></label>
+          <details><summary><span class="t "><span class="mn">Дэлгэрэнгүй</span><span class="ko">내용 보기</span></span></summary><span class="t "><span class="mn">Цуглуулах: нэр, бүртгэлийн дугаар, утас, хаяг, ажлын түүх, данс, Хоумтакс нэвтрэх мэдээлэл, хавсаргасан баримт · Зорилго: татварын буцаалтын шалгалт, мэдүүлэг, үр дүн мэдэгдэх · Хадгалах хугацаа: компанийн журмын дагуу (тусад нь мэдэгдэнэ) · Татгалзвал бүртгэл боломжгүй.</span><span class="ko">수집 항목: 성명, 외국인등록번호, 연락처, 주소, 근무이력, 계좌, 홈택스 로그인정보, 첨부서류 · 목적: 근로소득세 환급 검토·신고 대행·결과 안내 · 보관기간: 회사 운영정책에 따름(별도 안내) · 거부 시 접수 불가.</span></span></details></div></div>
+        <div class="agree"><input type="checkbox" id="agree2"><div><label for="agree2"><b><span class="t "><span class="mn">[Заавал]</span><span class="ko">[필수]</span></span></b> <span class="t "><span class="mn">Татварын төлөөлөгчөөр 세무법인 위드택스-ийг томилохыг зөвшөөрч байна (мэдүүлэг гаргахын өмнө дахин баталгаажуулна).</span><span class="ko">세무대리인으로 세무법인 위드택스를 선임하는 데 동의합니다 (실제 신고 전 다시 확인합니다).</span></span></label></div></div>
+        <div class="err" id="err3" role="alert"></div>
+        <button class="btn gold block" type="submit" id="submitBtn"><span class="t "><span class="mn">Бүртгүүлэх</span><span class="ko">접수하기</span></span></button>
+        <div class="prog" id="prog" hidden><div class="bar"><i id="bar"></i></div><span id="progT"></span></div>
+        <div class="navrow"><button type="button" class="btn ghost" data-go="2"><span class="t "><span class="mn">Өмнөх</span><span class="ko">이전</span></span></button></div>
+        <p class="note"><span class="t "><span class="mn">Бүртгэлийн дараа хариуцагч баримтыг шалгаад холбогдоно.</span><span class="ko">접수 후 담당자가 자료를 확인하고 연락드립니다.</span></span></p>
       </div>
-      <div class="field">
-        <label for="arcOld"><span class="t"><span class="mn">Өмнөх дугаар (виз солигдсон бол)</span><span class="ko">이전 외국인등록번호 (체류자격 변경 시)</span></span></label>
-        <input id="arcOld" inputmode="numeric" placeholder="—">
-      </div>
-    </div>
-    <div class="grid2">
-      <div class="field">
-        <label for="phone" class="req"><span class="t"><span class="mn">Гар утас</span><span class="ko">휴대폰</span></span></label>
-        <input id="phone" inputmode="tel" autocomplete="tel" placeholder="010-0000-0000">
-      </div>
-      <div class="field">
-        <label for="visa"><span class="t"><span class="mn">Визний төрөл</span><span class="ko">체류자격</span></span></label>
-        <select id="visa"><option value="">—</option><option>E-9</option><option>E-7</option><option>F-2</option><option>F-4</option><option>F-6</option><option>Бусад · 기타</option></select>
-      </div>
-    </div>
-    <div class="field">
-      <label for="addr" class="req"><span class="t"><span class="mn">Одоогийн хаяг (Солонгос)</span><span class="ko">현재 주소 (환급 통지용)</span></span></label>
-      <input id="addr" autocomplete="street-address" placeholder="경기도 ○○시 ○○로 00, 000호">
-    </div>
-
-    <hr>
-    <h3><span class="t"><span class="mn">2. Ажлын түүх</span><span class="ko">2. 근무 이력</span></span></h3>
-    <div class="field">
-      <label for="hireDate" class="req"><span class="t"><span class="mn">Солонгост анх ажилд орсон огноо</span><span class="ko">최초 취업일</span></span></label>
-      <input id="hireDate" inputmode="numeric" placeholder="20190326 → 2019-03-26" maxlength="10">
-      <div class="hint"><span class="t"><span class="mn">Хөдөлмөрийн гэрээний огноо. Хөнгөлөлтийн 5 жил эндээс тоологдоно.</span><span class="ko">근로계약일 기준. 감면 5년이 여기서 시작됩니다.</span></span></div>
-    </div>
-    <div class="field">
-      <div class="lbl req"><span class="t"><span class="mn">Өмнө нь буцаалт авч байсан уу?</span><span class="ko">이전에 환급 받은 적 있습니까?</span></span></div>
-      <div class="seg three">
-        <label><input type="radio" name="prev" value="no"><span class="t"><span class="mn">Үгүй</span><span class="ko">없음</span></span></label>
-        <label><input type="radio" name="prev" value="yes"><span class="t"><span class="mn">Тийм</span><span class="ko">있음</span></span></label>
-        <label><input type="radio" name="prev" value="unk"><span class="t"><span class="mn">Мэдэхгүй</span><span class="ko">모름</span></span></label>
-      </div>
-      <input id="prevYears" placeholder="2024 оныг хүртэл · 2024년까지" hidden>
-    </div>
-
-    <div class="field">
-      <label for="companies"><span class="t"><span class="mn">Ажилласан компаниуд (он, нэр)</span><span class="ko">근무 회사 (연도, 회사명)</span></span></label>
-      <textarea id="companies" placeholder="2021~2023 (주)광축&#10;2024~ 유일테크" style="min-height:64px"></textarea>
-    </div>
-    <hr>
-    <h3><span class="t"><span class="mn">3. Баримт хавсаргах</span><span class="ko">3. 자료 첨부</span></span></h3>
-    <div class="hint"><span class="t"><span class="mn">Утсаар бол "Зураг авах" дарж шууд зургаа авна. PDF файлыг "Файл сонгох"-оор оруулна.</span><span class="ko">휴대폰에서는 "사진 촬영"으로 바로 찍고, PDF는 "파일 선택"으로 올립니다.</span></span></div>
-    <div class="slots">
-      <div class="slot" data-role="id_front" data-req="1">
-        <div class="slot-h"><span class="t"><span class="mn">Гадаад иргэний үнэмлэх — урд тал</span><span class="ko">외국인등록증 앞면</span></span><span class="req-tag">*</span></div>
-        <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span>📷</span><span class="t inline"><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf"><span>＋</span><span class="t inline"><span class="mn">Файл сонгох</span><span class="ko">파일 선택</span></span></label></div>
-        <div class="dz"><span class="t inline"><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
-        <ul class="flist"></ul>
-      </div>
-      <div class="slot" data-role="id_back" data-req="1">
-        <div class="slot-h"><span class="t"><span class="mn">Гадаад иргэний үнэмлэх — ар тал</span><span class="ko">외국인등록증 뒷면</span></span><span class="req-tag">*</span></div>
-        <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span>📷</span><span class="t inline"><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf"><span>＋</span><span class="t inline"><span class="mn">Файл сонгох</span><span class="ko">파일 선택</span></span></label></div>
-        <div class="dz"><span class="t inline"><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
-        <ul class="flist"></ul>
-      </div>
-      <div class="slot" data-role="id_old">
-        <div class="slot-h"><span class="t"><span class="mn">Хуучин үнэмлэх (виз солигдсон бол)</span><span class="ko">변경 전 등록증 (체류자격 변경 시)</span></span></div>
-        <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span>📷</span><span class="t inline"><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf"><span>＋</span><span class="t inline"><span class="mn">Файл сонгох</span><span class="ko">파일 선택</span></span></label></div>
-        <div class="dz"><span class="t inline"><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
-        <ul class="flist"></ul>
-      </div>
-      <div class="slot" data-role="simplified" data-req="1" data-multi="1">
-        <div class="slot-h"><span class="t"><span class="mn">연말정산 간소화자료 PDF — он тус бүр</span><span class="ko">연말정산 간소화자료 PDF — 연도별</span></span><span class="req-tag">*</span></div>
-        <div class="slot-b"><label class="file"><input type="file" accept="application/pdf" multiple><span>＋</span><span class="t inline"><span class="mn">PDF сонгох (олон)</span><span class="ko">PDF 선택 (여러 개)</span></span></label></div>
-        <div class="dz"><span class="t inline"><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
-        <ul class="flist"></ul>
-      </div>
-      <div class="slot" data-role="withholding" data-multi="1">
-        <div class="slot-h"><span class="t"><span class="mn">원천징수영수증 — он тус бүр</span><span class="ko">근로소득 원천징수영수증 — 연도별</span></span></div>
-        <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span>📷</span><span class="t inline"><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf" multiple><span>＋</span><span class="t inline"><span class="mn">Файл сонгох (олон)</span><span class="ko">파일 선택 (여러 개)</span></span></label></div>
-        <div class="dz"><span class="t inline"><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
-        <ul class="flist"></ul>
-      </div>
-      <div class="slot" data-role="other" data-multi="1">
-        <div class="slot-h"><span class="t"><span class="mn">Бусад (цалингийн хуудас, гэрээ г.м.)</span><span class="ko">기타 (급여명세서·근로계약서 등)</span></span></div>
-        <div class="slot-b"><label class="file cam"><input type="file" accept="image/*" capture="environment"><span>📷</span><span class="t inline"><span class="mn">Зураг авах</span><span class="ko">사진 촬영</span></span></label><label class="file"><input type="file" accept="image/*,application/pdf" multiple><span>＋</span><span class="t inline"><span class="mn">Файл сонгох</span><span class="ko">파일 선택</span></span></label></div>
-        <div class="dz"><span class="t inline"><span class="mn">эсвэл файлаа энд чирж тавина / Ctrl+V</span><span class="ko">또는 여기에 파일을 끌어다 놓기 / Ctrl+V 붙여넣기</span></span></div>
-        <ul class="flist"></ul>
-      </div>
-    </div>
-    <div class="hint"><span class="t"><span class="mn">Нэг файл 10MB хүртэл, нийт 40MB хүртэл.</span><span class="ko">파일당 10MB, 전체 40MB까지.</span></span></div>
-
-    <hr>
-    <h3><span class="t"><span class="mn">4. Данс</span><span class="ko">4. 환급계좌</span></span></h3>
-    <div class="field">
-      <div class="lbl req"><span class="t"><span class="mn">Буцаалт хүлээн авах данс — заавал өөрийн нэр дээрх</span><span class="ko">환급계좌 — 반드시 본인 명의</span></span></div>
-      <div class="grid2">
-        <select id="bank"><option value="">Банк · 은행</option><option>국민은행</option><option>신한은행</option><option>우리은행</option><option>하나은행</option><option>농협</option><option>기업은행</option><option>카카오뱅크</option><option>토스뱅크</option><option>Бусад · 기타</option></select>
-        <input id="acct" inputmode="numeric" placeholder="Дансны дугаар · 계좌번호">
-      </div>
-      <div class="hint"><span class="t"><span class="mn">Татварын алба өөр хүний данс руу шилжүүлдэггүй.</span><span class="ko">국세청은 타인 명의 계좌로 환급하지 않습니다.</span></span></div>
-    </div>
-
-    <hr>
-    <h3><span class="t"><span class="mn">5. Хоумтакс (홈택스) нэвтрэх</span><span class="ko">5. 홈택스 로그인 정보</span></span></h3>
-    <div class="pw">
-      <div class="note">
-        <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg>
-        <div class="t"><span class="mn">Зөвхөн таны татварын баримт татахад ашиглана. Ажил дууссаны дараа нууц үгээ солихыг зөвлөж байна.</span><span class="ko">본인 자료 조회 목적으로만 사용합니다. 작업 완료 후 비밀번호 변경을 권장합니다.</span></div>
-      </div>
-      <div class="grid2">
-        <div class="field"><label for="htId"><span class="t"><span class="mn">Хоумтакс ID</span><span class="ko">홈택스 아이디</span></span></label><input id="htId" autocomplete="off" placeholder="OYUNTUGS88"></div>
-        <div class="field"><label for="htPw"><span class="t"><span class="mn">Нууц үг</span><span class="ko">비밀번호</span></span></label>
-          <div class="pwrow"><input id="htPw" type="password" autocomplete="off" placeholder="••••••••"><button type="button" id="pwEye">보기</button></div>
-        </div>
-      </div>
-      <div class="hint"><span class="t"><span class="mn">ID, нууц үгээ мэдэхгүй бол хоосон орхино уу. Хариуцагч тантай холбогдож тусална.</span><span class="ko">모르면 비워두세요. 담당자가 연락해 함께 찾습니다.</span></span></div>
-    </div>
-
-    <div class="field">
-      <label for="memo"><span class="t"><span class="mn">Нэмэлт тайлбар</span><span class="ko">추가 메모</span></span></label>
-      <textarea id="memo" placeholder="Жишээ: 2023 онд 2 компанид ажилласан · 예) 2023년에 회사 2곳 근무"></textarea>
-    </div>
-
-    <div class="agree">
-      <input type="checkbox" id="agree">
-      <div>
-        <label for="agree" class="t"><span class="mn">Хувийн мэдээллийг цуглуулж, татварын мэдүүлэгт ашиглахыг зөвшөөрч байна. Татварын төлөөлөгчөөр 세무법인 위드택스-ийг томилно.</span><span class="ko">[필수] 개인정보 수집·이용 및 세무대리(세무법인 위드택스) 수임에 동의합니다</span></label>
-        <details><summary class="ko">내용 보기 · Дэлгэрэнгүй</summary><span class="ko">수집 항목: 성명, 외국인등록번호, 연락처, 주소, 근무이력, 계좌, 홈택스 로그인정보, 첨부서류 · 목적: 근로소득세 경정·기한후신고 대행 및 결과 안내 · 보관: 신고 완료 후 5년(국세기본법), 홈택스 비밀번호는 즉시 폐기 · 거부 시 접수 불가.</span></details>
-      </div>
-    </div>
-
-    <div class="err" id="err" role="alert"></div>
-    <button class="submit" type="submit" id="submitBtn"><span class="t"><span class="mn">Бүртгүүлэх</span><span class="ko">접수하기</span></span></button>
-    <div class="prog" id="prog" hidden><div class="bar"><i id="bar"></i></div><span id="progT"></span></div>
-    <p class="after"><span class="t"><span class="mn">Бүртгэл орсон даруйд хариуцсан мэргэжилтэнд мэдэгдэнэ.</span><span class="ko">접수 즉시 담당 세무사에게 알림이 갑니다.</span></span></p>
+    </section>
   </form>
+
   <section class="done" id="done" hidden>
     <div class="ok" aria-hidden="true">✓</div>
-    <h2><span class="t"><span class="mn">Хүлээн авлаа</span><span class="ko">접수되었습니다</span></span></h2>
-    <p><span class="t"><span class="mn">Татварын мэргэжилтэн 3 ажлын өдрийн дотор тооцооны тайланг илгээнэ.</span><span class="ko">영업일 3일 안에 세액계산 보고서를 보내드립니다.</span></span></p>
-    <dl id="summary"></dl>
-    <p id="demoNote" hidden style="margin-top:14px;color:var(--urgent);font-weight:600">※ 테스트 모드 — 서버 미연결, 실제 저장되지 않았습니다.</p>
+    <h2><span class="t "><span class="mn">Бүртгэл хүлээн авлаа</span><span class="ko">접수되었습니다</span></span></h2>
+    <p><span class="t "><span class="mn">Шаардлагатай баримт бүгд баталгаажсанаас хойш 3 ажлын өдрийн дотор шалгалтын үр дүнг мэдэгдэнэ.</span><span class="ko">필요한 자료가 모두 확인되면 영업일 3일 이내 검토 결과를 안내합니다.</span></span></p>
+    <dl class="summary" id="summary" style="margin-top:16px"></dl>
   </section>
 </main>
+
 <footer>
   <div class="wrap">
-    <div class="ko"><b>세무법인 위드택스</b> · 서울특별시 강남구 역삼동 · 대표세무사 윤동인 · 02-536-1260</div>
-    <div class="ko">담당 세무사 박경준 · 몽골어 담당 한사라</div>
-    <div class="ko">본 페이지의 계산 결과는 추정치이며, 실제 환급액은 원천징수영수증 등 자료를 기준으로 재계산됩니다.</div>
+    <div><b>세무법인 위드택스</b> · <span class="t "><span class="mn">Сөүл, Каннам-гү, Ёксам-дон</span><span class="ko">서울특별시 강남구 역삼동</span></span> · <span class="t "><span class="mn">Тэргүүн татварын мэргэжилтэн Юн Дун Ин</span><span class="ko">대표세무사 윤동인</span></span> · 02-536-1260</div>
+    <div><span class="t "><span class="mn">Хариуцсан татварын мэргэжилтэн Пак Гён Жүн · Монгол хэлний хариуцагч Хан Са Ра</span><span class="ko">담당 세무사 박경준 · 몽골어 담당 한사라</span></span></div>
+    <div><span class="t "><span class="mn">Энэ сайтын тооцоо нь урьдчилсан дүн бөгөөд бодит буцаалт нь цалингийн татварын тодорхойлолт зэрэг баримтаар дахин тооцогдоно.</span><span class="ko">본 사이트의 계산 결과는 추정치이며, 실제 환급액은 원천징수영수증 등 자료를 기준으로 재계산됩니다.</span></span></div>
   </div>
 </footer>
 <script>
 (function(){
   const root=document.documentElement;
   const Y=[2021,2022,2023,2024,2025];
+  const L=()=>root.classList.contains('lang-ko')?'ko':'mn';
   function setLang(l){
-    root.classList.toggle('lang-ko',l==='ko');root.lang=l==='ko'?'ko':'mn';
-    document.getElementById('btnMn').setAttribute('aria-pressed',l==='mn');
+    root.classList.toggle('lang-ko',l==='ko');root.classList.toggle('lang-mn',l!=='ko');root.lang=l==='ko'?'ko':'mn';
+    document.getElementById('btnMn').setAttribute('aria-pressed',l!=='ko');
     document.getElementById('btnKo').setAttribute('aria-pressed',l==='ko');
+    document.querySelectorAll('[data-ph-mn]').forEach(el=>{el.placeholder=l==='ko'?el.dataset.phKo:el.dataset.phMn;});
+    document.querySelectorAll('option[data-mn]').forEach(o=>{o.textContent=l==='ko'?o.dataset.ko:o.dataset.mn;});
     try{localStorage.setItem('lang',l)}catch(e){}
-    if(typeof calc==='function')calc(); if(typeof renderAll==='function')renderAll();
+    if(typeof onLang==='function')onLang(l);
   }
   document.getElementById('btnMn').onclick=()=>setLang('mn');
   document.getElementById('btnKo').onclick=()=>setLang('ko');
 
-  // ===== config =====
-  const ENDPOINT=window.WITHTAX_ENDPOINT||''; // Apps Script 웹앱 URL (backend/README 참고)
-  const MAX_FILE=10*1024*1024, MAX_TOTAL=40*1024*1024;
-  const store={}; // role -> [File]
+  const ENDPOINT=window.WITHTAX_ENDPOINT||'';
+  const MAX_FILE=10*1024*1024;
+  const store={};
+  const $=id=>document.getElementById(id);
+  const g=id=>($(id).value||'').trim();
   const fmt=b=>b>1048576?(b/1048576).toFixed(1)+'MB':Math.max(1,Math.round(b/1024))+'KB';
-  function renderSlot(slot){
-    const role=slot.dataset.role, list=store[role]||[], ul=slot.querySelector('.flist'); ul.innerHTML='';
+  if(!ENDPOINT){$('offline').hidden=false;$('submitBtn').disabled=true;}
+  // ---- steps ----
+  let cur=1;
+  function show(n){cur=n;[1,2,3].forEach(i=>{$('s'+i).hidden=i!==n;const sb=$('sb'+i);sb.className=i===n?'cur':(i<n?'done':'');});
+    if(n===3)renderReview();window.scrollTo({top:0,behavior:'smooth'});}
+  function v1(){const ko=L()==='ko';
+    if(!g('name'))return [ko?'영문 성명을 입력하세요.':'Овог нэрээ оруулна уу.','name'];
+    if(g('phone').replace(/\D/g,'').length<10)return [ko?'휴대폰 번호를 정확히 입력하세요.':'Утасны дугаараа зөв оруулна уу.','phone'];
+    const m=g('hireDate').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+    if(!m||+m[1]<2000||+m[1]>2026||+m[2]<1||+m[2]>12||+m[3]<1||+m[3]>31)return [ko?'최초 취업일을 2019-03-26 형식으로 입력하세요.':'Ажилд орсон огноог 2019-03-26 хэлбэрээр оруулна уу.','hireDate'];
+    return null;}
+  function v2(){const ko=L()==='ko';
+    if(g('arc').replace(/\D/g,'').length!==13)return [ko?'외국인등록번호 13자리를 입력하세요.':'Бүртгэлийн дугаарын 13 оронг оруулна уу.','arc'];
+    if(!g('addr'))return [ko?'주소를 입력하세요.':'Хаягаа оруулна уу.','addr'];
+    if(!document.querySelector('input[name=prev]:checked'))return [ko?'이전 환급 여부를 선택하세요.':'Өмнө буцаалт авсан эсэхээ сонгоно уу.',null];
+    for(const s of document.querySelectorAll('.slot[data-req]')){if(!store[s.dataset.role].length)return [(ko?'필수 자료 누락: ':'Шаардлагатай баримт дутуу: ')+s.querySelector('.slot-h .'+(ko?'ko':'mn')).textContent,null,s];}
+    return null;}
+  function v3(){const ko=L()==='ko';
+    if(!g('bank'))return [ko?'은행을 선택하세요.':'Банкаа сонгоно уу.','bank'];
+    if(g('acct').replace(/\D/g,'').length<6)return [ko?'계좌번호를 입력하세요.':'Дансны дугаараа оруулна уу.','acct'];
+    if(!$('agree1').checked||!$('agree2').checked)return [ko?'필수 동의 2가지에 체크해 주세요.':'Заавал 2 зөвшөөрлийг чагтална уу.',null];
+    return null;}
+  function showErr(n,r){const e=$('err'+n);if(!r){e.textContent='';return true;}e.textContent=r[0];if(r[1])$(r[1]).focus();if(r[2])r[2].scrollIntoView({behavior:'smooth',block:'center'});return false;}
+  document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>{const to=+b.dataset.go;
+    if(to>cur){if(cur===1&&!showErr(1,v1()))return;if(cur===2&&!showErr(2,v2()))return;}
+    show(to);}));
+  function renderReview(){const ko=L()==='ko';const files=Object.values(store).reduce((a,l)=>a+l.length,0);
+    const rows=[[ko?'성명':'Нэр',g('name').toUpperCase()],[ko?'휴대폰':'Утас',g('phone')],[ko?'최초 취업일':'Ажилд орсон огноо',g('hireDate')],[ko?'외국인등록번호':'Бүртгэлийн дугаар',g('arc').slice(0,8)+'*****'],[ko?'주소':'Хаяг',g('addr')],[ko?'첨부 파일':'Файл',files+(ko?'건':'')],[ko?'홈택스 아이디':'Хоумтакс ID',g('htId')||(ko?'미입력 (담당자 안내)':'Хоосон (хариуцагч зааварлана)')]];
+    const dl=$('review');dl.innerHTML='';rows.forEach(([k,v])=>{const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v;dl.append(dt,dd);});}
+  // ---- files ----
+  function renderSlot(slot){const role=slot.dataset.role,list=store[role]||[],ul=slot.querySelector('.flist');ul.innerHTML='';const ko=L()==='ko';
     list.forEach((f,i)=>{const li=document.createElement('li');
-      if(f.type.startsWith('image/')){const im=document.createElement('img');im.src=URL.createObjectURL(f);li.appendChild(im);}
-      else{const d=document.createElement('span');d.className='pdf';d.textContent='PDF';li.appendChild(d);}
+      if(f.type.startsWith('image/')){const im=document.createElement('img');im.src=URL.createObjectURL(f);im.alt='';li.appendChild(im);}else{const d=document.createElement('span');d.className='pdf';d.textContent='PDF';li.appendChild(d);}
       const nm=document.createElement('span');nm.className='nm';nm.textContent=f.name;const sz=document.createElement('span');sz.className='sz';sz.textContent=fmt(f.size);
-      const b=document.createElement('button');b.type='button';b.textContent='×';b.onclick=()=>{list.splice(i,1);renderSlot(slot);};
+      const b=document.createElement('button');b.type='button';b.textContent='×';b.setAttribute('aria-label',(ko?'삭제: ':'Устгах: ')+f.name);b.onclick=()=>{list.splice(i,1);renderSlot(slot);};
       li.append(nm,sz,b);ul.appendChild(li);});
-    slot.classList.toggle('ok',list.length>0);
-  }
+    slot.classList.toggle('ok',list.length>0);}
   function renderAll(){document.querySelectorAll('.slot').forEach(renderSlot);}
   document.querySelectorAll('.slot').forEach(slot=>{
-    const role=slot.dataset.role, multi=!!slot.dataset.multi; store[role]=[];
-    const accept=slot.dataset.role==='simplified'?f=>f.type==='application/pdf':f=>f.type==='application/pdf'||f.type.startsWith('image/');
-    const addFiles=list=>{const err=document.getElementById('err');const ko=root.classList.contains('lang-ko');
-      for(const f of list){ if(!accept(f)){err.textContent=(ko?'PDF 또는 이미지만 가능: ':'Зөвхөн PDF эсвэл зураг: ')+f.name;continue;}
+    const role=slot.dataset.role,multi=!!slot.dataset.multi;store[role]=[];
+    const accept=role==='simplified'?f=>f.type==='application/pdf':f=>f.type==='application/pdf'||f.type.startsWith('image/');
+    const addFiles=list=>{const err=$('err2');const ko=L()==='ko';
+      for(const f of list){if(!accept(f)){err.textContent=(ko?'PDF 또는 이미지만 가능: ':'Зөвхөн PDF эсвэл зураг: ')+f.name;continue;}
         if(f.size>MAX_FILE){err.textContent=(ko?'10MB 초과: ':'10MB-аас их: ')+f.name;continue;}
-        if(!multi)store[role]=[]; if(!store[role].some(x=>x.name===f.name&&x.size===f.size))store[role].push(f);}
+        if(!multi)store[role]=[];if(!store[role].some(x=>x.name===f.name&&x.size===f.size))store[role].push(f);}
       renderSlot(slot);};
     slot.querySelectorAll('input[type=file]').forEach(inp=>inp.addEventListener('change',()=>{addFiles(inp.files);inp.value='';}));
     ['dragenter','dragover'].forEach(ev=>slot.addEventListener(ev,e=>{e.preventDefault();e.stopPropagation();slot.classList.add('over');}));
@@ -568,76 +393,54 @@ label.file .t.inline .mn::before,label.file .t.inline .ko::before{content:""}
     slot.addEventListener('paste',e=>{const fs=[...(e.clipboardData?.files||[])];if(fs.length){e.preventDefault();addFiles(fs.map((f,i)=>f.name&&f.name!=='image.png'?f:new File([f],'paste_'+Date.now()+'_'+i+'.'+(f.type.split('/')[1]||'png'),{type:f.type})));}});
     slot.addEventListener('click',e=>{if(!e.target.closest('label,button,input'))slot.focus();});
   });
-  // 페이지 어디서든 드롭하면 브라우저가 파일을 열지 않도록
   ['dragover','drop'].forEach(ev=>document.addEventListener(ev,e=>{if(!e.target.closest('.slot'))e.preventDefault();}));
-  const proxy=document.getElementById('proxy'), pf=document.getElementById('proxyFields');
-  proxy.addEventListener('change',()=>{pf.hidden=!proxy.checked;});
-  document.querySelectorAll('input[name=prev]').forEach(r=>r.addEventListener('change',()=>{document.getElementById('prevYears').hidden=r.value!=='yes'||!r.checked;}));
-  ['phone','pxTel'].forEach(id=>{const el=document.getElementById(id);el.addEventListener('input',()=>{const v=el.value.replace(/\D/g,'').slice(0,11);el.value=v.length>7?v.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3'):v.length>3?v.replace(/(\d{3})(\d+)/,'$1-$2'):v;});});
-  const hd=document.getElementById('hireDate');
-  hd.addEventListener('input',()=>{const v=hd.value.replace(/\D/g,'').slice(0,8);hd.value=v.length>6?v.slice(0,4)+'-'+v.slice(4,6)+'-'+v.slice(6):v.length>4?v.slice(0,4)+'-'+v.slice(4):v;});
-  hd.addEventListener('blur',()=>{const m=hd.value.match(/^(\d{4})-(\d{2})-(\d{2})$/);if(hd.value&&(!m||+m[2]<1||+m[2]>12||+m[3]<1||+m[3]>31||+m[1]<2000||+m[1]>2026)){hd.setCustomValidity('x');hd.style.borderColor='var(--bad)';}else{hd.setCustomValidity('');hd.style.borderColor='';}});
-  const arc=document.getElementById('arc');arc.addEventListener('input',()=>{const v=arc.value.replace(/\D/g,'').slice(0,13);arc.value=v.length>6?v.slice(0,6)+'-'+v.slice(6):v;});
-  const pw=document.getElementById('htPw'),eye=document.getElementById('pwEye');eye.onclick=()=>{const s=pw.type==='password';pw.type=s?'text':'password';eye.textContent=s?'숨김':'보기';};
+  // ---- inputs ----
+  const proxy=$('proxy');proxy.addEventListener('change',()=>{$('proxyFields').hidden=!proxy.checked;});
+  document.querySelectorAll('input[name=prev]').forEach(r=>r.addEventListener('change',()=>{$('prevYears').hidden=r.value!=='yes'||!r.checked;}));
+  ['phone','pxTel'].forEach(id=>{const el=$(id);el.addEventListener('input',()=>{const v=el.value.replace(/\D/g,'').slice(0,11);el.value=v.length>7?v.replace(/(\d{3})(\d{3,4})(\d{4})/,'$1-$2-$3'):v.length>3?v.replace(/(\d{3})(\d+)/,'$1-$2'):v;});});
+  ['arc','arcOld'].forEach(id=>{const el=$(id);el.addEventListener('input',()=>{const v=el.value.replace(/\D/g,'').slice(0,13);el.value=v.length>6?v.slice(0,6)+'-'+v.slice(6):v;});});
+  const hd=$('hireDate');hd.addEventListener('input',()=>{const v=hd.value.replace(/\D/g,'').slice(0,8);hd.value=v.length>6?v.slice(0,4)+'-'+v.slice(4,6)+'-'+v.slice(6):v.length>4?v.slice(0,4)+'-'+v.slice(4):v;});
+  const pw=$('htPw'),eye=$('pwEye');eye.onclick=()=>{const s=pw.type==='password';pw.type=s?'text':'password';eye.textContent=L()==='ko'?(s?'숨김':'보기'):(s?'Нуух':'Харах');};
+  // ---- submit ----
   const toB64=f=>new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result.split(',')[1]);r.onerror=rej;r.readAsDataURL(f);});
-  // 사진 축소: 긴 변 2000px, JPEG 0.85 → 보통 300~800KB (문자 판독에 충분)
-  async function shrink(f){
-    if(!f.type.startsWith('image/')||f.size<700*1024)return f;
-    try{const bmp=await createImageBitmap(f);const L=2000,s=Math.min(1,L/Math.max(bmp.width,bmp.height));
-      const c=document.createElement('canvas');c.width=Math.round(bmp.width*s);c.height=Math.round(bmp.height*s);
-      c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
-      const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',0.85));
-      if(!blob||blob.size>=f.size)return f;
-      return new File([blob],f.name.replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg'});}catch(e){return f;}
-  }
-  async function post(obj){const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(obj)});return r.json();}
-
-  document.getElementById('apply').addEventListener('submit',async e=>{
-    e.preventDefault();
-    const err=document.getElementById('err'); const ko=root.classList.contains('lang-ko');
-    const g=id=>document.getElementById(id).value.trim();
-    const need=[['name','Овог нэрээ оруулна уу.','영문 성명을 입력하세요.'],['arc','Бүртгэлийн дугаараа оруулна уу.','외국인등록번호를 입력하세요.'],['phone','Утасны дугаараа оруулна уу.','휴대폰 번호를 입력하세요.'],['addr','Хаягаа оруулна уу.','주소를 입력하세요.'],['hireDate','Анх ажилд орсон огноог YYYY-MM-DD хэлбэрээр оруулна уу.','최초 취업일을 2019-03-26 형식으로 입력하세요.'],['acct','Дансны дугаараа оруулна уу.','계좌번호를 입력하세요.']];
-    for(const [id,mn,k] of need){ if(!g(id)||(id==='hireDate'&&!/^\d{4}-\d{2}-\d{2}$/.test(g(id)))){err.textContent=ko?k:mn;document.getElementById(id).focus();return;} }
-    if(!g('bank')){err.textContent=ko?'은행을 선택하세요.':'Банкаа сонгоно уу.';return;}
-    if(!document.querySelector('input[name=prev]:checked')){err.textContent=ko?'이전 환급 여부를 선택하세요.':'Өмнө буцаалт авсан эсэхээ сонгоно уу.';return;}
-    for(const slot of document.querySelectorAll('.slot[data-req]')){ if(!store[slot.dataset.role].length){err.textContent=(ko?'필수 자료 누락: ':'Шаардлагатай баримт дутуу: ')+slot.querySelector('.slot-h .'+(ko?'ko':'mn')).textContent;slot.scrollIntoView({behavior:'smooth',block:'center'});return;} }
+  async function shrink(f){if(!f.type.startsWith('image/')||f.size<700*1024)return f;
+    try{const bmp=await createImageBitmap(f);const Lm=2000,s=Math.min(1,Lm/Math.max(bmp.width,bmp.height));const c=document.createElement('canvas');c.width=Math.round(bmp.width*s);c.height=Math.round(bmp.height*s);c.getContext('2d').drawImage(bmp,0,0,c.width,c.height);
+      const blob=await new Promise(r=>c.toBlob(r,'image/jpeg',0.85));if(!blob||blob.size>=f.size)return f;return new File([blob],f.name.replace(/\.[^.]+$/,'')+'.jpg',{type:'image/jpeg'});}catch(e){return f;}}
+  async function post(obj){const r=await fetch(ENDPOINT,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify(obj)});if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}
+  let busy=false;
+  $('apply').addEventListener('submit',async e=>{
+    e.preventDefault();if(busy)return;const ko=L()==='ko';
+    if(!ENDPOINT){showErr(3,[ko?'온라인 접수는 준비 중입니다.':'Онлайн бүртгэл бэлтгэгдэж байна.',null]);return;}
+    if(!showErr(1,v1())){show(1);return;} if(!showErr(2,v2())){show(2);return;} if(!showErr(3,v3()))return;
     const all=Object.entries(store).flatMap(([role,l])=>l.map(f=>({role,f})));
-    if(!document.getElementById('agree').checked){err.textContent=ko?'동의에 체크해 주세요.':'Зөвшөөрлийг чагтална уу.';return;}
-    err.textContent='';
-    const base={lang:ko?'ko':'mn',name:g('name').toUpperCase(),arc:g('arc'),arcOld:g('arcOld'),phone:g('phone'),visa:g('visa'),addr:g('addr'),hireDate:g('hireDate'),companies:g('companies'),
+    const base={lang:L(),name:g('name').toUpperCase(),arc:g('arc'),arcOld:g('arcOld'),phone:g('phone'),visa:g('visa'),addr:g('addr'),hireDate:g('hireDate'),companies:g('companies'),
       prev:document.querySelector('input[name=prev]:checked').value,prevYears:g('prevYears'),bank:g('bank'),acct:g('acct'),htId:g('htId'),htPw:g('htPw'),memo:g('memo'),
       proxy:proxy.checked?(g('pxName')+' '+g('pxTel')).trim():''};
-    const btn=document.getElementById('submitBtn'),prog=document.getElementById('prog'),bar=document.getElementById('bar'),progT=document.getElementById('progT');
-    btn.disabled=true;prog.hidden=false;
-    const fail=msg=>{btn.disabled=false;prog.hidden=true;err.textContent=(ko?'전송 실패. 다시 시도하거나 담당자에게 연락하세요. ':'Илгээж чадсангүй. Дахин оролдоно уу. ')+(msg||'');};
+    const btn=$('submitBtn'),prog=$('prog'),bar=$('bar'),progT=$('progT');
+    busy=true;btn.disabled=true;prog.hidden=false;$('err3').textContent='';
+    const fail=()=>{busy=false;btn.disabled=false;prog.hidden=true;$('err3').textContent=ko?'전송에 실패했습니다. 입력한 내용은 유지됩니다. 잠시 후 다시 시도하거나 담당자에게 연락해 주세요.':'Илгээж чадсангүй. Оруулсан мэдээлэл хадгалагдсан. Дахин оролдох эсвэл хариуцагчтай холбогдоно уу.';};
     let res;
     try{
-      if(!ENDPOINT){res={ok:true,no:'TEST-'+Date.now().toString().slice(-6),demo:true};}
-      else{
-        progT.textContent=ko?'접수 생성 중…':'Бүртгэл үүсгэж байна…';bar.style.width='5%';
-        const c=await post(Object.assign({action:'create',fileList:all.map(x=>({role:x.role,name:x.f.name,type:x.f.type,size:x.f.size}))},base));
-        if(!c.ok)return fail(c.error);
-        const counters={};
-        for(let i=0;i<all.length;i++){
-          const x=all[i]; counters[x.role]=(counters[x.role]||0)+1;
-          progT.textContent=(ko?'파일 올리는 중 ':'Файл илгээж байна ')+(i+1)+'/'+all.length+' · '+x.f.name;
-          bar.style.width=Math.round(5+85*(i)/all.length)+'%';
-          const f=await shrink(x.f); const data=await toB64(f);
-          let r=null,tries=0; while(tries<2){tries++;try{r=await post({action:'file',no:c.no,folderId:c.folderId,idx:counters[x.role],file:{role:x.role,name:f.name,type:f.type||'application/octet-stream',data}});if(r.ok)break;}catch(ex){r={ok:false,error:String(ex)};}}
-          if(!r||!r.ok)return fail((ko?'파일 전송 실패: ':'Файл илгээгдсэнгүй: ')+x.f.name+' '+(r&&r.error||''));
-        }
-        progT.textContent=ko?'마무리 중…':'Дуусгаж байна…';bar.style.width='95%';
-        res=await post(Object.assign({action:'done',no:c.no,folderId:c.folderId,count:all.length,files:all.map(x=>({role:x.role,name:x.f.name}))},base));
-        if(!res.ok)return fail(res.error);
-      }
-    }catch(ex){return fail(String(ex));}
+      progT.textContent=ko?'접수 생성 중…':'Бүртгэл үүсгэж байна…';bar.style.width='5%';
+      const c=await post(Object.assign({action:'create',fileList:all.map(x=>({role:x.role,name:x.f.name,type:x.f.type,size:x.f.size}))},base));
+      if(!c||!c.ok||!c.no)return fail();
+      const counters={};
+      for(let i=0;i<all.length;i++){const x=all[i];counters[x.role]=(counters[x.role]||0)+1;
+        progT.textContent=(ko?'파일 올리는 중 ':'Файл илгээж байна ')+(i+1)+'/'+all.length+' · '+x.f.name;bar.style.width=Math.round(5+85*i/all.length)+'%';
+        const f=await shrink(x.f);const data=await toB64(f);let r=null;
+        for(let t=0;t<2&&!(r&&r.ok);t++){try{r=await post({action:'file',no:c.no,folderId:c.folderId,idx:counters[x.role],file:{role:x.role,name:f.name,type:f.type||'application/octet-stream',data}});}catch(ex){r=null;}}
+        if(!r||!r.ok)return fail();}
+      progT.textContent=ko?'마무리 중…':'Дуусгаж байна…';bar.style.width='95%';
+      res=await post(Object.assign({action:'done',no:c.no,folderId:c.folderId,count:all.length,files:all.map(x=>({role:x.role,name:x.f.name}))},base));
+      if(!res||!res.ok)return fail();
+    }catch(ex){return fail();}
     bar.style.width='100%';progT.textContent=ko?'완료':'Дууслаа';
-    const sum=document.getElementById('summary');sum.innerHTML='';
-    const rows=[[ko?'접수번호':'Бүртгэлийн №',res.no],[ko?'성명':'Нэр',base.name],[ko?'연락처':'Утас',base.phone],[ko?'최초 취업일':'Ажилд орсон огноо',base.hireDate],[ko?'환급계좌':'Данс',base.bank+' '+base.acct],[ko?'첨부':'Хавсралт',all.length+(ko?'건':'')],[ko?'입력자':'Оруулсан',base.proxy||(ko?'본인':'Өөрөө')]];
-    rows.forEach(([k,v])=>{const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v;sum.append(dt,dd);});
-    if(res.demo)document.getElementById('demoNote').hidden=false;
-    e.target.hidden=true;const done=document.getElementById('done');done.hidden=false;done.scrollIntoView({behavior:'smooth',block:'start'});
+    const sum=$('summary');sum.innerHTML='';
+    [[ko?'접수번호':'Бүртгэлийн №',res.no],[ko?'성명':'Нэр',base.name],[ko?'휴대폰':'Утас',base.phone],[ko?'환급계좌':'Данс',base.bank+' '+base.acct],[ko?'첨부':'Файл',all.length+(ko?'건':'')],[ko?'입력자':'Оруулсан',base.proxy||(ko?'본인':'Өөрөө')]]
+      .forEach(([k,v])=>{const dt=document.createElement('dt');dt.textContent=k;const dd=document.createElement('dd');dd.textContent=v;sum.append(dt,dd);});
+    $('apply').hidden=true;document.querySelector('.stepbar').hidden=true;const done=$('done');done.hidden=false;done.scrollIntoView({behavior:'smooth',block:'start'});busy=false;
   });
+  function onLang(){renderAll();if(cur===3)renderReview();}
 
   let l0='mn'; try{l0=localStorage.getItem('lang')||'mn'}catch(e){} setLang(l0);
 })();
